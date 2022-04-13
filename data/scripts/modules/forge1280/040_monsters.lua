@@ -159,7 +159,7 @@ function rollFiend()
 	table.remove(PotentialFiends, roll)
 	
 	local monster = Monster(monsterId)
-	if monster and not monster:isRemoved() then
+	if monster and not monster:isRemoved() and not monster:isFiendish() then
 		monster:setFiendish(true, fiendishDuration)
 		return true
 	end

@@ -118,7 +118,7 @@ spell.onCastSpell = function(player, variant)
 	
 	local difficulty = "Unknown"
 	local bestiaryEntry = GameBestiary[target:getBestiaryRaceName()]
-	if bestiaryEntry and bestiaryEntry.rarity == 1 then
+	if bestiaryEntry then
 		if player:getBestiaryRaceProgress(bestiaryEntry.id) == 4 then
 			difficulty = difficulties[bestiaryEntry.difficulty] or difficulty
 		end

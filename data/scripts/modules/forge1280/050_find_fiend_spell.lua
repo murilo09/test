@@ -66,11 +66,13 @@ spell.onCastSpell = function(player, variant)
 		if newTarget then
 			local targetPos = newTarget:getPosition()
 			local newDistance = targetPos.x + targetPos.y + targetPos.z
-			if newDistance < distance and now < expiresAt then
+			if newDistance < distance then
 				distance = newDistance
 				target = newTarget
 				expires = expiresAt
 			end
+		else
+			FiendishMonsters[creatureId] = nil
 		end
 	end
 	
@@ -112,6 +114,10 @@ spell.onCastSpell = function(player, variant)
 	local minStr = minLeft > 1 and string.format("%d minute%s", minLeft, minLeft ~= 1 and "s" or "") or "one minute"
 	
 	if player:getGroup():getAccess() then
+		if expires == -1 then
+			minStr = expires
+		end
+		
 		player:sendTextMessage(MESSAGE_INFO_DESCR, string.format("%s %s.\nPosition: %d, %d, %d\nDuration: %s", target:getName(), description, targetPosition.x, targetPosition.y, targetPosition.z, minStr))
 		return true
 	end
@@ -124,7 +130,7 @@ spell.onCastSpell = function(player, variant)
 		end
 	end
 	
-	minStr = minLeft < 16 and string.format(" This monster will stay fiendish for less than %s.", minStr) or ""
+	minStr = expires ~= -1 and minLeft < 16 and string.format(" This monster will stay fiendish for less than %s.", minStr) or ""
 	player:sendTextMessage(MESSAGE_INFO_DESCR, string.format(searchResult, description, difficulty, minStr))
 	creaturePosition:sendMagicEffect(CONST_ME_MAGIC_BLUE)
 	return true

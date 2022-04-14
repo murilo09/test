@@ -2484,6 +2484,20 @@ void ProtocolGame::sendPrivateMessage(const Player* speaker, SpeakClasses type, 
 	writeToOutputBuffer(msg);
 }
 
+void ProtocolGame::sendNamedPrivateMessage(const std::string& speaker, SpeakClasses type, const std::string& text)
+{
+	NetworkMessage msg;
+	msg.addByte(0xAA);
+	static uint32_t statementId = 0;
+	msg.add<uint32_t>(++statementId);
+	msg.addString(speaker);
+	msg.addByte(0x00); // "(Traded)" suffix after player name
+	msg.add<uint16_t>(0);
+	msg.addByte(type);
+	msg.addString(text);
+	writeToOutputBuffer(msg);
+}
+
 void ProtocolGame::sendCancelTarget()
 {
 	NetworkMessage msg;
@@ -3446,7 +3460,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 	}
 
 	// Player vocation info
-	if (creatureType == CREATURETYPE_PLAYER) {
+	if (creatureType == CREATURETYPE_PLAYER && !creature->isHealthHidden()) {
 		const Player* otherCreature = creature->getPlayer();
 		if (otherCreature) {
 			msg.addByte(otherCreature->getVocation()->getClientId());

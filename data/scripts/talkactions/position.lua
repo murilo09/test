@@ -1,7 +1,7 @@
 local talk = TalkAction("/pos", "!pos")
 
 function talk.onSay(player, words, param)
-	if not player:getGroup():getAccess() then
+	if not player:isAdmin() then
 		return true
 	end
 

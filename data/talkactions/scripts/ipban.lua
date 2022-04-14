@@ -33,7 +33,9 @@ function onSay(player, words, param)
 
 	resultId = db.storeQuery("SELECT 1 FROM `ip_bans` WHERE `ip` = " .. targetIp)
 	if resultId ~= false then
-		if not kicked then
+		if kicked then
+			player:sendColorMessage(targetName .. " has been IP banned for " .. ipBanDays .. " days.", MESSAGE_COLOR_PURPLE)
+		else
 			player:sendColorMessage(targetName .. " is already banned.", MESSAGE_COLOR_PURPLE)
 		end
 		result.free(resultId)

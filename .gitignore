@@ -150,6 +150,9 @@ App_Data/*.ldf
 Thumbs.db
 ehthumbs.db
 
+# Windows shortcuts
+*.lnk
+
 # Folder config file
 Desktop.ini
 

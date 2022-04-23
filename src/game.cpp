@@ -2768,7 +2768,7 @@ void Game::playerQuickLoot(uint32_t playerId, const Position& position, uint8_t 
 		std::vector<Direction> listDir;
 		if (player->getPathTo(position, listDir, 0, 1, true, true)) {
 			g_dispatcher.addTask(createTask([=, playerID = player->getID(), listDir = std::move(listDir)]() { playerAutoWalk(playerID, listDir); }));
-			SchedulerTask* task = createSchedulerTask(RANGE_WRAP_ITEM_INTERVAL, [=]() { playerQuickLoot(playerId, position, stackPos, spriteId); });
+			SchedulerTask* task = createSchedulerTask(RANGE_LOOT_ITEM_INTERVAL, [=]() { playerQuickLoot(playerId, position, stackPos, spriteId); });
 			player->setNextWalkActionTask(task);
 		} else {
 			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);

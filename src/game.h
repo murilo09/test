@@ -58,6 +58,7 @@ static constexpr int32_t RANGE_USE_WITH_CREATURE_INTERVAL = 400;
 static constexpr int32_t RANGE_ROTATE_ITEM_INTERVAL = 400;
 static constexpr int32_t RANGE_BROWSE_FIELD_INTERVAL = 400;
 static constexpr int32_t RANGE_WRAP_ITEM_INTERVAL = 400;
+static constexpr int32_t RANGE_LOOT_ITEM_INTERVAL = 400;
 static constexpr int32_t RANGE_REQUEST_TRADE_INTERVAL = 400;
 static constexpr int32_t RANGE_INSPECT_ITEM_INTERVAL = 400;
 

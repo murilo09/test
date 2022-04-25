@@ -3404,10 +3404,16 @@ void ProtocolGame::sendSessionEnd(SessionEndTypes_t reason)
 ////////////// Add common messages
 void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bool known, uint32_t remove)
 {
-	CreatureType_t creatureType = creature->isHealthHidden() ? CREATURETYPE_HIDDEN : creature->getType();
+	CreatureType_t creatureType = creature->getType();
+	OperatingSystem_t playerClient = player->getOperatingSystem();
+
+	// fix for OTC not displaying hidden monsters
+	if (playerClient < CLIENTOS_OTCLIENT_LINUX && creature->isHealthHidden()) {
+		creatureType = CREATURETYPE_HIDDEN;
+	}
 
 	// fix monster skull display in QT client
-	if (player->getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX) {
+	if (playerClient < CLIENTOS_OTCLIENT_LINUX) {
 		if (creatureType != CREATURETYPE_HIDDEN && creature->getSkullClient(creature) != SKULL_NONE) {
 			creatureType = CREATURETYPE_PLAYER;
 		}
@@ -3437,10 +3443,11 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 		msg.add<uint32_t>(creature->getID());
 		msg.addByte(creatureType);
 
-		if (creatureType == CREATURETYPE_SUMMON_OWN) {
-			msg.add<uint32_t>(masterId);
+		if (playerClient < CLIENTOS_OTCLIENT_LINUX) { // otc doesnt support it yet
+			if (creatureType == CREATURETYPE_SUMMON_OWN) {
+				msg.add<uint32_t>(masterId);
+			}
 		}
-
 		msg.addString(creature->isHealthHidden() ? "" : creature->getName());
 	}
 
@@ -3477,8 +3484,11 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 
 	// Creature type and summon emblem
 	msg.addByte(creatureType);
-	if (creatureType == CREATURETYPE_SUMMON_OWN) {
-		msg.add<uint32_t>(masterId);
+
+	if (playerClient < CLIENTOS_OTCLIENT_LINUX) { // otc doesnt support it yet
+		if (creatureType == CREATURETYPE_SUMMON_OWN) {
+			msg.add<uint32_t>(masterId);
+		}
 	}
 
 	// Player vocation info

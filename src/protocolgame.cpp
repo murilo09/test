@@ -3423,7 +3423,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 	const Player* masterPlayer = nullptr;
 	uint32_t masterId = 0;
 
-	if (creatureType == CREATURETYPE_MONSTER) {
+	if (creatureType == CREATURETYPE_MONSTER && playerClient < CLIENTOS_OTCLIENT_LINUX) {
 		const Creature* master = creature->getMaster();
 		if (master) {
 			masterPlayer = master->getPlayer();
@@ -3442,12 +3442,10 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 		msg.add<uint32_t>(remove);
 		msg.add<uint32_t>(creature->getID());
 		msg.addByte(creatureType);
-
-		if (playerClient < CLIENTOS_OTCLIENT_LINUX) { // otc doesnt support it yet
-			if (creatureType == CREATURETYPE_SUMMON_OWN) {
-				msg.add<uint32_t>(masterId);
-			}
+		if (creatureType == CREATURETYPE_SUMMON_OWN) {
+			msg.add<uint32_t>(masterId);
 		}
+
 		msg.addString(creature->isHealthHidden() ? "" : creature->getName());
 	}
 
@@ -3484,11 +3482,8 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 
 	// Creature type and summon emblem
 	msg.addByte(creatureType);
-
-	if (playerClient < CLIENTOS_OTCLIENT_LINUX) { // otc doesnt support it yet
-		if (creatureType == CREATURETYPE_SUMMON_OWN) {
-			msg.add<uint32_t>(masterId);
-		}
+	if (creatureType == CREATURETYPE_SUMMON_OWN) {
+		msg.add<uint32_t>(masterId);
 	}
 
 	// Player vocation info

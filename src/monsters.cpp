@@ -608,7 +608,9 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			combat->setArea(area);
 		}
 
-		if (spell->conditionType != CONDITION_NONE) {
+		std::string tmpName = asLowerCaseString(spell->name);
+
+		if (tmpName != "drunk" && spell->conditionType != CONDITION_NONE) {
 			ConditionType_t conditionType = spell->conditionType;
 
 			uint32_t tickInterval = 2000;
@@ -623,8 +625,6 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			Condition* condition = getDamageCondition(conditionType, conMaxDamage, conMinDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 		}
-
-		std::string tmpName = asLowerCaseString(spell->name);
 
 		if (tmpName == "melee") {
 			sb.isMelee = true;

@@ -40,7 +40,7 @@ ec.onLookInMarket = {}
 ec.onTradeRequest = {}
 ec.onTradeAccept = {}
 ec.onTradeCompleted = {}
-ec.onMoveItem = {}
+ec.onMoveItem = {returnValue=true}
 ec.onItemMoved = {}
 ec.onMoveCreature = {}
 ec.onReportRuleViolation = {}

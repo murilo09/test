@@ -1524,7 +1524,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint64_t money, uint32_t flags /*= 0*
 
 	std::multimap<uint32_t, Item*> moneyMap;
 	uint64_t moneyCount = 0;
-	for (size_t i = cylinder->getFirstIndex(), j = cylinder->getLastIndex(); i <= j; ++i) {
+	for (size_t i = cylinder->getFirstIndex(), j = cylinder->getLastIndex(); i < j; ++i) {
 		Thing* thing = cylinder->getThing(i);
 		if (!thing) {
 			continue;
@@ -1545,6 +1545,11 @@ bool Game::removeMoney(Cylinder* cylinder, uint64_t money, uint32_t flags /*= 0*
 				moneyMap.emplace(worth, item);
 			}
 		}
+	}
+
+	Player* player = dynamic_cast<Player*>(cylinder);
+	if (player) {
+		containers.push_back(player->getStoreInbox());
 	}
 
 	size_t i = 0;

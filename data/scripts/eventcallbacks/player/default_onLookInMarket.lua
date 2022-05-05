@@ -328,8 +328,14 @@ ec.onLookInMarket = function(self, itemType, tier)
 	-- weight
 	response:addString(string.format("%0.2f", itemType:getWeight()/100))
 	
+	-- Imbuement Slots
+	if ImbuingSystem then
+		response:addString(itemType:getSocketCount())
+	else
+		response:addU16(0)
+	end
+		
 	-- to do
-	response:addU16(0) -- Imbuement Slots
 	response:addU16(0) -- Magic Shield Capacity
 	response:addU16(0) -- Cleave
 	

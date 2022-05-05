@@ -766,7 +766,10 @@ do
 		
 		-- imbuements (to do)
 		-- \nImbuements: (Basic Strike 2:30h, Basic Void 2:30h, Empty Slot).
-
+		if ImbuingSystem then
+			response[#response + 1] = item:getImbuementsDescription()
+		end
+		
 		-- item class
 		-- Classification: x Tier: y (0.50% Onslaught).
 		do

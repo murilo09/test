@@ -4288,6 +4288,18 @@ void Game::combatGetTypeInfo(CombatType_t combatType, Creature* target, TextColo
 
 bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage& damage)
 {
+	// healing can't deal damage
+	if (damage.primary.type == COMBAT_HEALING) {
+		damage.primary.value = std::abs(damage.primary.value);
+	} else {
+		damage.primary.value = -std::abs(damage.primary.value);
+	}
+	if (damage.secondary.type == COMBAT_HEALING) {
+		damage.secondary.value = std::abs(damage.secondary.value);
+	} else {
+		damage.secondary.value = -std::abs(damage.secondary.value);
+	}
+
 	const Position& targetPos = target->getPosition();
 	if (damage.primary.value > 0) {
 		if (target->getHealth() <= 0) {
@@ -4310,7 +4322,8 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 			const auto& events = target->getCreatureEvents(CREATURE_EVENT_HEALTHCHANGE);
 			if (!events.empty()) {
 				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeHealthChange(target, attacker, damage);
+					// healing
+					creatureEvent->executeHealthChange(target, attacker, damage, true);
 				}
 				damage.origin = ORIGIN_NONE;
 				return combatChangeHealth(attacker, target, damage);
@@ -4407,6 +4420,10 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 					const auto& events = target->getCreatureEvents(CREATURE_EVENT_MANACHANGE);
 					if (!events.empty()) {
 						for (CreatureEvent* creatureEvent : events) {
+							// damage that would be taken if mana shield was not active
+							creatureEvent->executeHealthChange(target, attacker, damage, true);
+
+							// damage blocked by mana shield
 							creatureEvent->executeManaChange(target, attacker, damage);
 						}
 						healthChange = damage.primary.value + damage.secondary.value;
@@ -4479,7 +4496,8 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 			const auto& events = target->getCreatureEvents(CREATURE_EVENT_HEALTHCHANGE);
 			if (!events.empty()) {
 				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeHealthChange(target, attacker, damage);
+					// damage taken when mana shielded player ran out of mana
+					creatureEvent->executeHealthChange(target, attacker, damage, false);
 				}
 				damage.origin = ORIGIN_NONE;
 				return combatChangeHealth(attacker, target, damage);

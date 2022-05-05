@@ -60,6 +60,7 @@ ec.onInspectNpcTradeItem = {}
 ec.onInspectCompendiumItem = {}
 ec.onMinimapQuery = {}
 ec.onConnect = {}
+ec.onUseStamina = {[2]=1}
 
 -- Monster
 ec.onDropLoot = {}

@@ -387,7 +387,7 @@ do
 			-- abilities (will be reused)
 			local abilities = itemType:getAbilities()
 			
-			-- stats: hp/mp/soul/magic level
+			-- stats: hp/mp/soul/magic level/cap
 			do
 				local stats = {}
 				-- flat buffs
@@ -406,21 +406,30 @@ do
 				end
 				
 				-- display the buffs
-				for _, statData in pairs(stats) do
+				for stat, statData in pairs(stats) do
 					local displayValues = {}
 					if statData.flat then
 						displayValues[#displayValues + 1] = statData.flat
 					end
 					
 					if statData.percent then
-						displayValues[#displayValues + 1] = statData.percent
+						displayValues[#displayValues + 1] = statData.percent - 100
 					end
 					
 					-- desired format examples:
 					-- +5%
 					-- +20 and 5%
 					if #displayValues > 0 then
-						displayValues[1] = string.format("%+d", displayValues[1])
+						if stat ~= STAT_CAPACITY+1 then
+							displayValues[1] = string.format("%+d", displayValues[1])
+						else
+							displayValues[1] = string.format("%+d", displayValues[1]/100)
+						end						
+						
+						if displayValues[2] then
+							displayValues[2] = string.format("%d%%", displayValues[2])
+						end
+						
 						descriptions[#descriptions + 1] = string.format("%s %s", statData.name, table.concat(displayValues, " and "))
 					end
 				end
@@ -820,7 +829,7 @@ do
 							for _, vocName in ipairs(runeVocMap) do
 								local vocation = Vocation(vocName)
 								if vocation and vocation:getPromotion() then
-									vocAttrs[#vocAttrs + 1] = vocName
+									vocAttrs[#vocAttrs + 1] = string.format("%ss", vocName:lower())
 								end
 							end
 						end

@@ -599,6 +599,7 @@ int32_t Player::getDefaultStats(stats_t stat) const
 		case STAT_MAXHITPOINTS: return healthMax;
 		case STAT_MAXMANAPOINTS: return manaMax;
 		case STAT_MAGICPOINTS: return getBaseMagicLevel();
+		case STAT_CAPACITY: return capacity;
 		default: return 0;
 	}
 }

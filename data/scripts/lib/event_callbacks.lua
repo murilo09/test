@@ -23,6 +23,7 @@ ec.onChangeMount = {}
 ec.onAreaCombat = {returnValue=true}
 ec.onTargetCombat = {returnValue=true}
 ec.onHear = {}
+ec.onAddCondition = {returnValue=true}
 
 -- Party
 ec.onJoin = {}

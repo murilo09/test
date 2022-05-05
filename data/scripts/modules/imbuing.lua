@@ -459,11 +459,10 @@ ImbuingTypes = {
 		},
 		categories = {"boots"}
 	},
-	-- to do
-	--[[
 	[IMBUEMENT_BOOST_CAPACITY] = {
 		name = "Featherweight",
 		type = IMBUEMENT_TYPE_BOOST,
+		subType = CONDITION_PARAM_STAT_CAPACITYPERCENT,
 		description = "Capacity %+d%%.",
 		outOfCombat = true,
 		tiers = {
@@ -476,7 +475,7 @@ ImbuingTypes = {
 
 	-- paral deflect
 	[IMBUEMENT_DEFLECT_PARALYZE] = {
-		type = IMBUEMENT_TYPE_BOOST,
+		type = IMBUEMENT_TYPE_VIBRANCY,
 		name = "Vibrancy",
 		description = "Reduces the chance of getting paralysed by %d%%.",
 		tiers = {
@@ -486,7 +485,6 @@ ImbuingTypes = {
 		},
 		categories = {"boots"}
 	},
-	]]
 }
 
 -- auto register out of combat imbuements to tick
@@ -1335,6 +1333,6 @@ end
 login:register()
 
 -- to do:
--- bonus cap
+-- creature callback onAddCondition
 -- paral deflect (remove condition chance)
 -- ui + equip cooldown (?)

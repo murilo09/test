@@ -3404,16 +3404,10 @@ void ProtocolGame::sendSessionEnd(SessionEndTypes_t reason)
 ////////////// Add common messages
 void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bool known, uint32_t remove)
 {
-	CreatureType_t creatureType = creature->getType();
-	OperatingSystem_t playerClient = player->getOperatingSystem();
-
-	// fix for OTC not displaying hidden monsters
-	if (playerClient < CLIENTOS_OTCLIENT_LINUX && creature->isHealthHidden()) {
-		creatureType = CREATURETYPE_HIDDEN;
-	}
+	CreatureType_t creatureType = creature->isHealthHidden() ? CREATURETYPE_HIDDEN : creature->getType();
 
 	// fix monster skull display in QT client
-	if (playerClient < CLIENTOS_OTCLIENT_LINUX) {
+	if (player->getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX) {
 		if (creatureType != CREATURETYPE_HIDDEN && creature->getSkullClient(creature) != SKULL_NONE) {
 			creatureType = CREATURETYPE_PLAYER;
 		}
@@ -3423,7 +3417,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 	const Player* masterPlayer = nullptr;
 	uint32_t masterId = 0;
 
-	if (creatureType == CREATURETYPE_MONSTER && playerClient < CLIENTOS_OTCLIENT_LINUX) {
+	if (creatureType == CREATURETYPE_MONSTER) {
 		const Creature* master = creature->getMaster();
 		if (master) {
 			masterPlayer = master->getPlayer();

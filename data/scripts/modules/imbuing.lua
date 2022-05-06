@@ -1200,10 +1200,14 @@ do
 	ec:register()
 end
 
+ParalDeflect = {}
+
 local death = CreatureEvent("imbuDeath")
 function death.onDeath(creature, corpse, killer, mostDamageKiller, lastHitUnjustified, mostDamageUnjustified)
-	-- clear cached imbuements
-	PlayerImbuements[creature:getId()] = nil
+	-- clear cached values
+	local cid = creature:getId()
+	ParalDeflect[cid] = nil
+	PlayerImbuements[cid] = nil
 	return true
 end
 death:register()
@@ -1316,8 +1320,6 @@ function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primar
 	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
 imbuConversion:register()
-
-ParalDeflect = {}
 
 local logout = CreatureEvent("imbuLogout")
 function logout.onLogout(player)

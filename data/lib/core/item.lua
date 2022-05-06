@@ -409,27 +409,21 @@ do
 				for stat, statData in pairs(stats) do
 					local displayValues = {}
 					if statData.flat then
-						displayValues[#displayValues + 1] = statData.flat
+						if stat ~= STAT_CAPACITY+1 then
+							displayValues[1] = string.format("%+d", statData.flat)
+						else
+							displayValues[1] = string.format("%+d", statData.flat/100)
+						end
 					end
 					
 					if statData.percent then
-						displayValues[#displayValues + 1] = statData.percent - 100
+						displayValues[#displayValues + 1] = string.format("%d%%", statData.percent - 100)
 					end
 					
 					-- desired format examples:
 					-- +5%
 					-- +20 and 5%
 					if #displayValues > 0 then
-						if stat ~= STAT_CAPACITY+1 then
-							displayValues[1] = string.format("%+d", displayValues[1])
-						else
-							displayValues[1] = string.format("%+d", displayValues[1]/100)
-						end						
-						
-						if displayValues[2] then
-							displayValues[2] = string.format("%d%%", displayValues[2])
-						end
-						
 						descriptions[#descriptions + 1] = string.format("%s %s", statData.name, table.concat(displayValues, " and "))
 					end
 				end

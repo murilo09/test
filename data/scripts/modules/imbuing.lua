@@ -59,6 +59,7 @@ IMBUEMENT_TYPE_BOOST = 4
 IMBUEMENT_TYPE_PROTECTION = 5
 IMBUEMENT_TYPE_DAMAGE = 6
 IMBUEMENT_TYPE_SPEED = 7
+IMBUEMENT_TYPE_VIBRANCY = 8
 
 -- condition subids for imbuements
 SUBID_IMBU_CRIT = 6000
@@ -1037,6 +1038,7 @@ function Player:registerImbuements()
 		[IMBUEMENT_TYPE_PROTECTION] = {},
 		[IMBUEMENT_TYPE_DAMAGE] = {},
 		[IMBUEMENT_TYPE_SPEED] = {},
+		[IMBUEMENT_TYPE_VIBRANCY] = {}
 	}
 
 	for slotId = CONST_SLOT_FIRST, CONST_SLOT_LAST do
@@ -1315,10 +1317,14 @@ function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primar
 end
 imbuConversion:register()
 
+ParalDeflect = {}
+
 local logout = CreatureEvent("imbuLogout")
 function logout.onLogout(player)
-	-- clear cached imbuements
-	PlayerImbuements[player:getId()] = nil
+	-- clear cached values
+	local cid = player:getId()
+	PlayerImbuements[cid] = nil
+	ParalDeflect[cid] = nil
 	return true
 end
 logout:register()
@@ -1328,11 +1334,59 @@ function login.onLogin(player)
 	player:registerImbuements()
 	player:registerEvent("imbuLogout")
 	player:registerEvent("imbuDeath")
+	player:registerEvent("imbuResistances") -- damage taken
+	player:registerEvent("imbuDamageConversion") -- pvp damage conversion
 	return true
 end
 login:register()
 
--- to do:
--- creature callback onAddCondition
--- paral deflect (remove condition chance)
--- ui + equip cooldown (?)
+local spawn = EventCallback
+function spawn.onSpawn(monster, position, startup, artificial)
+	monster:registerEvent("imbuDamageConversion") -- pve damage conversion
+	return true
+end
+spawn:register()
+
+VibrancyCache = {}
+if ImbuingTypes and ImbuingTypes[IMBUEMENT_DEFLECT_PARALYZE] then
+	local tiers = ImbuingTypes[IMBUEMENT_DEFLECT_PARALYZE].tiers
+	if tiers then
+		for tier, tierData in pairs(tiers) do
+			VibrancyCache[tier] = tierData.amount
+		end
+	end
+end
+
+local paralDeflect = EventCallback
+function paralDeflect.onAddCondition(creature, condition, isForced)
+
+	local player = Player(creature)
+	if not player then
+		return RETURNVALUE_NOERROR
+	end
+
+	local cid = creature:getId()
+	if ParalDeflect[cid] and os.time() < ParalDeflect[cid] then
+		return RETURNVALUE_NOTPOSSIBLE
+	end
+	
+	if creature:hasCondition(CONDITION_PARALYZE) then
+		local imbuements = PlayerImbuements[cid]
+		if imbuements then
+			-- roll for vibrancy
+			for _, imbuement in ipairs(imbuements[IMBUEMENT_TYPE_VIBRANCY]) do
+				local chance = VibrancyCache[imbuement[2]]
+				
+				print(chance, VibrancyCache[imbuement[2]], imbuement[2])
+				if chance and math.random(100) < chance then
+					ParalDeflect[cid] = os.time() + 2
+					creature:removeCondition(CONDITION_PARALYZE)
+					return RETURNVALUE_NOTPOSSIBLE
+				end
+			end
+		end
+	end
+
+	return RETURNVALUE_NOERROR	
+end
+paralDeflect:register()

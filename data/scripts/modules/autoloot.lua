@@ -561,7 +561,6 @@ do
 		local itemCount = 0
 		local goldCount = 0
 		local corpseCount = 0
-		local lootContainers = player:getLootContainers()
 		
 		if position.x ~= CONTAINER_POSITION then
 			-- shift + right click on the floor
@@ -588,6 +587,7 @@ do
 			local hasBodies = false
 			local looted = false
 
+			local lootContainers = player:getLootContainers()
 			local items = tile:getItems()
 			for _, corpse in ipairs(items) do
 				if corpse:isCorpse() and corpse:isContainer() then
@@ -651,12 +651,12 @@ do
 						return
 					end
 					
-					lootedItems, lootedGold, itemCount, goldCount = internalLootCorpse(player, clickedItem, lootedItems, lootedGold, lootContainers)
+					lootedItems, lootedGold, itemCount, goldCount = internalLootCorpse(player, clickedItem, lootedItems, lootedGold, player:getLootContainers())
 				else
 					-- clicked an item inside the corpse
 					local isCurrency = clickedItem:isCurrency()
 					
-					local ret = internalLootItem(player, clickedItem, lootContainers, player:getStorageValue(PlayerStorageKeys.autoLootFallback) == 1, player:getSlotItem(CONST_SLOT_BACKPACK))
+					local ret = internalLootItem(player, clickedItem, player:getLootContainers(), player:getStorageValue(PlayerStorageKeys.autoLootFallback) == 1, player:getSlotItem(CONST_SLOT_BACKPACK))
 					if ret == RETURNVALUE_NOERROR then
 						local itemCount = clickedItem:getCount()
 						clickedItem:remove()

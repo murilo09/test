@@ -1,13 +1,13 @@
 local backpacks = {
-	[1987] = { sockets = 1 },
+	[1987] = { }, -- bags are not imbuable
 	[1988] = { sockets = 1 },
-	[1991] = { sockets = 1 },
-	[1992] = { sockets = 1 },
-	[1993] = { sockets = 1 },
-	[1994] = { sockets = 1 },
-	[1995] = { sockets = 1 },
-	[1996] = { sockets = 1 },
-	[1997] = { sockets = 1 },
+	[1991] = { },
+	[1992] = { },
+	[1993] = { },
+	[1994] = { },
+	[1995] = { },
+	[1996] = { },
+	[1997] = { },
 	[1998] = { sockets = 1 },
 	[1999] = { sockets = 1 },
 	[2000] = { sockets = 1 },
@@ -16,26 +16,26 @@ local backpacks = {
 	[2003] = { sockets = 1 },
 	[2004] = { sockets = 1 },
 	[2365] = { sockets = 1 },
-	[3939] = { sockets = 1 },
+	[3939] = { },
 	[3940] = { sockets = 1 },
 	[3960] = { sockets = 1 },
 	[5801] = { sockets = 1 },
 	[5926] = { sockets = 1 },
-	[5927] = { sockets = 1 },
+	[5927] = { },
 	[5949] = { sockets = 1 },
-	[5950] = { sockets = 1 },
+	[5950] = { },
 	[7342] = { sockets = 1 },
-	[7343] = { sockets = 1 },
+	[7343] = { },
 	[9774] = { sockets = 1 },
-	[9775] = { sockets = 1 },
+	[9775] = { },
 	[10518] = { sockets = 1 },
 	[10519] = { sockets = 1 },
-	[10520] = { sockets = 1 },
+	[10520] = { },
 	[10521] = { sockets = 1 },
 	[10522] = { sockets = 1 },
 	[11119] = { sockets = 1 },
 	[11241] = { sockets = 1 },
-	[11242] = { sockets = 1 },
+	[11242] = { },
 	[11243] = { sockets = 1 },
 	[11244] = { sockets = 1 },
 	[11263] = { sockets = 1 },
@@ -53,7 +53,7 @@ local backpacks = {
 	[26181] = { sockets = 1 },
 	[27049] = { sockets = 1 },
 	[27051] = { sockets = 1 },
-	[28436] = { sockets = 1 },
+	[28436] = { }, -- blossom bag (not imbuable)
 	[31227] = { sockets = 1 },
 	[32853] = { sockets = 1 },
 	[34281] = { sockets = 1 },
@@ -1795,4 +1795,16 @@ for itemId, itemData in pairs(Equippables.throwables) do
 	else
 		generateDefaultMissile(itemId)
 	end
+end
+
+-- helper for imbuing altar
+function ItemType:getEquippableCategory()
+	local itemId = self:getId()
+	for categoryType, category in pairs(Equippables) do
+		if category[itemId] then
+			return categoryType
+		end
+	end
+	
+	return "NONE"
 end

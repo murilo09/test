@@ -1,6 +1,37 @@
 -- requires ITEMSYSTEM module
 ImbuingSystem = true -- enables the system
 
+IMBUING_DEFAULT_DURATION = 20 * 60 * 60 -- 20 hours
+IMBUING_DEFAULT_REMOVECOST = 15000 -- base chance for successful imbuing
+
+-- tier names
+ImbuingTiers = {
+	[1] = {
+		name = "Basic",
+		price = 5000,
+		protectionCost = 10000,
+		successChance = 90,
+		removeCost = IMBUING_DEFAULT_REMOVECOST,
+		duration = IMBUING_DEFAULT_DURATION
+	},
+	[2] = {
+		name = "Intricate",
+		price = 25000,
+		protectionCost = 30000,
+		successChance = 70,
+		removeCost = IMBUING_DEFAULT_REMOVECOST,
+		duration = IMBUING_DEFAULT_DURATION
+	},
+	[3] = {
+		name = "Powerful",
+		price = 100000,
+		protectionCost = 50000,
+		successChance = 50,
+		removeCost = IMBUING_DEFAULT_REMOVECOST,
+		duration = IMBUING_DEFAULT_DURATION
+	},
+}
+
 -- imbuements are consumed every minute with an offset to prevent lagging
 ASYNC_IMBUEMENT_PLAYERS_PER_TURN = 10 -- how many players equipments should the system check at once?
 ASYNC_IMBUEMENT_TURN_INTERVAL = 1000 -- time to wait before checking next x players
@@ -78,17 +109,12 @@ PassiveImbuementSlots = {CONST_SLOT_BACKPACK, CONST_SLOT_FEET}
 local damageDefaults = {"weapons", "weapons_distance"}
 local protectionDefaults = {"armors", "shields"}
 local boostDefaults = {"helmets"}
-local tierNames = {
-	[1] = "Basic",
-	[2] = "Intricate",
-	[3] = "Powerful"
-}
 
 -- helper for magic level imbuement
 local tier1ML = {32083}
 local tier2ML = {32083, 36812, 31371}
 
-local function isMLImbuable(player, item, imbuement, tier)
+local function isMLImbuable(item, imbuement, tier)
 	if not item:getType():isHelmet() then
 		return false
 	end
@@ -97,7 +123,7 @@ local function isMLImbuable(player, item, imbuement, tier)
 	if vocStr and (vocStr:find("sorcerer") or vocStr:find("druid")) then
 		return true
 	end
-	
+
 	local itemId = item:getId()
 	return tier == 1 and table.contains(tier1ML, itemId) or tier == 2 and table.contains(tier2ML, itemId)
 end
@@ -114,6 +140,9 @@ ImbuingTypes = {
 	[IMBUEMENT_CRIT] = {
 		-- name config (tierName + this name)
 		name = "Strike",
+		
+		-- category in imbuing UI
+		tag = "Critical Hit",
 		
 		-- determines the buff type
 		type = IMBUEMENT_TYPE_CRIT,
@@ -136,6 +165,8 @@ ImbuingTypes = {
 	-- damage conversion
 	[IMBUEMENT_DAMAGE_DEATH] = {
 		name = "Reap",
+		tag = "Element Damage (Death)",
+				
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_DEATHDAMAGE, -- secondary value for buff type
 		description = "Converts %d%% of physical damage to death damage.",
@@ -148,6 +179,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_DAMAGE_EARTH] = {
 		name = "Venom",
+		tag = "Element Damage (Earth)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_EARTHDAMAGE,
 		description = "Converts %d%% of physical damage to earth damage.",
@@ -160,6 +193,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_DAMAGE_ENERGY] = {
 		name = "Electrify",
+		tag = "Element Damage (Energy)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_ENERGYDAMAGE,
 		description = "Converts %d%% of physical damage to energy damage.",
@@ -172,6 +207,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_DAMAGE_FIRE] = {
 		name = "Scorch",
+		tag = "Element Damage (Fire)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_FIREDAMAGE,
 		description = "Converts %d%% of physical damage to fire damage.",
@@ -188,6 +225,8 @@ ImbuingTypes = {
 		-- you can uncomment tiers to enable
 		-- made up recipe: 25 colourful feathers, 20 dragon priests wandtips, 5 fafnar symbols
 		name = "Purify",
+		tag = "Element Damage (Holy)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_HOLYDAMAGE,
 		description = "Converts %d%% of physical damage to holy damage.",
@@ -202,6 +241,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_DAMAGE_ICE] = {
 		name = "Frost",
+		tag = "Element Damage (Ice)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_ICEDAMAGE,
 		description = "Converts %d%% of physical damage to ice damage.",
@@ -221,6 +262,8 @@ ImbuingTypes = {
 		-- you can uncomment tiers to enable
 		-- made up recipe: 25 globs of mercury, 10 werewolf fangs, 5 yielocks 
 		name = "Wound",
+		tag = "Element Damage (Physical)",
+
 		type = IMBUEMENT_TYPE_DAMAGE,
 		subType = COMBAT_PHYSICALDAMAGE,
 		description = "Converts %d%% of magic damage to physical damage.",
@@ -237,6 +280,8 @@ ImbuingTypes = {
 	-- element protection
 	[IMBUEMENT_PROTECTION_DEATH] = {
 		name = "Lich Shroud",
+		tag = "Element Protection (Death)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_DEATHDAMAGE,
 		description = "Reduces incoming death damage by %d%%.",
@@ -249,6 +294,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_PROTECTION_EARTH] = {
 		name = "Snake Skin",
+		tag = "Element Protection (Earth)",
+		
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_EARTHDAMAGE,
 		description = "Reduces incoming earth damage by %d%%.",
@@ -261,6 +308,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_PROTECTION_ENERGY] = {
 		name = "Cloud Fabric",
+		tag = "Element Protection (Energy)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_ENERGYDAMAGE,
 		description = "Reduces incoming energy damage by %d%%.",
@@ -273,6 +322,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_PROTECTION_FIRE] = {
 		name = "Dragon Hide",
+		tag = "Element Protection (Fire)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_FIREDAMAGE,
 		description = "Reduces incoming fire damage by %d%%.",
@@ -285,6 +336,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_PROTECTION_HOLY] = {
 		name = "Demon Presence",
+		tag = "Element Protection (Holy)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_HOLYDAMAGE,
 		description = "Reduces incoming holy damage by %d%%.",
@@ -297,6 +350,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_PROTECTION_ICE] = {
 		name = "Quara Scale",
+		tag = "Element Protection (Ice)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_ICEDAMAGE,
 		description = "Reduces incoming ice damage by %d%%.",
@@ -312,6 +367,8 @@ ImbuingTypes = {
 		-- you can uncomment tiers to enable
 		-- made up recipe: 25 sea serpent scales, 15 scythe legs, 5 pieces of royal steel
 		name = "Hardening",
+		tag = "Element Protection (Physical)",
+
 		type = IMBUEMENT_TYPE_PROTECTION,
 		subType = COMBAT_PHYSICALDAMAGE,
 		description = "Reduces incoming physical damage by %d%%.",
@@ -328,6 +385,8 @@ ImbuingTypes = {
 	-- leech
 	[IMBUEMENT_LEECH_LIFE] = {
 		name = "Vampirism",
+		tag = "Life Leech",
+
 		type = IMBUEMENT_TYPE_LEECH_HP,
 		description = "Converts %d%% of damage to health with a chance of %d%%.",
 		tiers = {
@@ -339,6 +398,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_LEECH_MANA] = {
 		name = "Void",
+		tag = "Mana Leech",
+
 		type = IMBUEMENT_TYPE_LEECH_MP,
 		description = "Converts %d%% of damage to mana with a chance of %d%%.",
 		tiers = {
@@ -352,6 +413,8 @@ ImbuingTypes = {
 	-- skill boost
 	[IMBUEMENT_BOOST_AXE] = {
 		name = "Chop",
+		tag = "Skillboost (Axe Fighting)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_AXE,
 		description = "Axe fighting %+d.",
@@ -365,6 +428,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_BOOST_CLUB] = {
 		name = "Bash",
+		tag = "Skillboost (Club Fighting)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_CLUB,
 		description = "Club fighting %+d.",
@@ -378,6 +443,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_BOOST_DISTANCE] = {
 		name = "Precision",
+		tag = "Skillboost (Distance Fighting)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_DISTANCE,
 		description = "Distance fighting %+d.",
@@ -395,6 +462,8 @@ ImbuingTypes = {
 		-- made up recipe: 25 trollroots, 15 draken wristbands, 5 behemoth claws
 		-- note: if you do not have any fist weapons in your server, only helmets will be imbuable
 		name = "Punch",
+		tag = "Skillboost (Fist Fighting)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_FIST,
 		description = "Fist fighting %+d.",
@@ -410,6 +479,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_BOOST_MAGIC] = {
 		name = "Epiphany",
+		tag = "Skillboost (Magic Level)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_STAT_MAGICPOINTS,
 		description = "Magic Level %+d.",
@@ -422,6 +493,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_BOOST_SHIELD] = {
 		name = "Blockade",
+		tag = "Skillboost (Shielding)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_SHIELD,
 		description = "Shielding %+d.",
@@ -435,6 +508,8 @@ ImbuingTypes = {
 	},
 	[IMBUEMENT_BOOST_SWORD] = {
 		name = "Slash",
+		tag = "Skillboost (Sword Fighting)",
+
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_SKILL_SWORD,
 		description = "Sword fighting %+d.",
@@ -450,6 +525,8 @@ ImbuingTypes = {
 	-- stat boost
 	[IMBUEMENT_BOOST_SPEED] = {
 		name = "Swiftness",
+		tag = "Skillboost (Walking Speed)",
+
 		type = IMBUEMENT_TYPE_SPEED,
 		description = "Speed %+d.",
 		outOfCombat = true, -- also burns out of combat
@@ -458,10 +535,13 @@ ImbuingTypes = {
 			[2] = {icon = 74, amount = 15, products = {[19738] = 15, [11219] = 25}},
 			[3] = {icon = 75, amount = 30, products = {[19738] = 15, [11219] = 25, [15484] = 20}},
 		},
-		categories = {"boots"}
+		categories = {"boots"},
+		items = {36753, 36754}, -- soul items
 	},
 	[IMBUEMENT_BOOST_CAPACITY] = {
 		name = "Featherweight",
+		tag = "Skillboost (Capacity)",
+		
 		type = IMBUEMENT_TYPE_BOOST,
 		subType = CONDITION_PARAM_STAT_CAPACITYPERCENT,
 		description = "Capacity %+d%%.",
@@ -477,6 +557,8 @@ ImbuingTypes = {
 	-- paral deflect
 	[IMBUEMENT_DEFLECT_PARALYZE] = {
 		type = IMBUEMENT_TYPE_VIBRANCY,
+		tag = "Paralysis Removal",
+
 		name = "Vibrancy",
 		description = "Reduces the chance of getting paralysed by %d%%.",
 		tiers = {
@@ -520,6 +602,17 @@ for i = IMBUEMENT_PROTECTION_FIRST, IMBUEMENT_PROTECTION_LAST do
 	end
 end
 
+function getImbuingTierById(id)
+	return tonumber(id) and ImbuingTiers[id] or {
+		name = "Unknown",
+		protectionCost = 0,
+		price = 0,
+		successChance = 0,
+		removeCost = IMBUING_DEFAULT_REMOVECOST,
+		duration = IMBUING_DEFAULT_DURATION
+	}
+end
+
 function getImbuementIconByProps(properties)
 	-- nil was passed, return empty socket
 	if not properties then
@@ -548,7 +641,7 @@ function getImbuementName(type, tier, duration)
 	
 	return string.format(
 		"%s %s %s",
-		tierNames[tier] or "Unknown",
+		getImbuingTierById(tier).name,
 		ImbuingTypes[type] and ImbuingTypes[type].name or "Untitled",
 		duration > 0 and string.format("%d:%.2dh", math.floor(duration / 60), duration % 60) or "-:--h"
 	)
@@ -732,7 +825,7 @@ function getInspectImbuements(item, isVirtual)
 						description = "disabled"
 					end
 					
-					slotStr = string.format("%s %s", tierNames[tier] or "Unknown", imbuInfo.name or "Untitled")					
+					slotStr = string.format("%s %s", getImbuingTierById(tier).name, imbuInfo.name or "Untitled")					
 				else
 					-- error type imbuement
 					slotStr = string.format("error imbuement %d", type)
@@ -978,6 +1071,11 @@ function Player:loadImbuements()
 	if boostCount > 0 then
 		local condition = Condition(CONDITION_ATTRIBUTES)
 		for type, amount in pairs(boosts) do
+			if type == CONDITION_PARAM_STAT_CAPACITYPERCENT then
+				-- to give +x% cap, the condition has to be (100 + x)% otherwise it will be a reduction
+				amount = amount + 100
+			end
+			
 			condition:setParameter(type, amount)
 		end
 		condition:setParameter(CONDITION_PARAM_SUBID, SUBID_IMBU_BOOST)
@@ -1248,7 +1346,7 @@ imbuResistances:register()
 -- player imbuements converting dealt damage before hitting the creature
 local imbuConversion = CreatureEvent("imbuDamageConversion")
 function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin, isBeforeManaShield)
-	if primaryType == COMBAT_HEALING or not(isBeforeManaShield and attacker and attacker:isPlayer()) then
+	if primaryType == COMBAT_HEALING or not(attacker and attacker:isPlayer()) or creature:isPlayer() and not isBeforeManaShield then
 		return primaryDamage, primaryType, secondaryDamage, secondaryType
 	end
 	
@@ -1268,7 +1366,7 @@ function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primar
 	else
 		damageTypes[secondaryType] = secondaryDamage
 	end
-	
+
 	for _, imbuement in pairs(conversions) do
 		local buffId = imbuement[1]
 		local tier = imbuement[2]
@@ -1295,7 +1393,7 @@ function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primar
 			end
 		end		
 	end
-	
+
 	primaryDamage = 0
 	primaryType = COMBAT_NONE
 	secondaryDamage = 0
@@ -1316,7 +1414,7 @@ function imbuConversion.onHealthChange(creature, attacker, primaryDamage, primar
 			doTargetCombat(attacker:getId(), creature:getId(), type, -damage, -damage, CONST_ME_NONE, origin, true, true, false)
 		end
 	end
-	
+
 	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
 imbuConversion:register()
@@ -1367,6 +1465,10 @@ function paralDeflect.onAddCondition(creature, condition, isForced)
 		return RETURNVALUE_NOERROR
 	end
 
+	if not(condition and condition:getType() == CONDITION_PARALYZE) then
+		return RETURNVALUE_NOERROR
+	end
+	
 	local cid = creature:getId()
 	if ParalDeflect[cid] and os.time() < ParalDeflect[cid] then
 		return RETURNVALUE_NOTPOSSIBLE
@@ -1379,7 +1481,6 @@ function paralDeflect.onAddCondition(creature, condition, isForced)
 			for _, imbuement in ipairs(imbuements[IMBUEMENT_TYPE_VIBRANCY]) do
 				local chance = VibrancyCache[imbuement[2]]
 				
-				print(chance, VibrancyCache[imbuement[2]], imbuement[2])
 				if chance and math.random(100) < chance then
 					ParalDeflect[cid] = os.time() + 2
 					creature:removeCondition(CONDITION_PARALYZE)
@@ -1392,3 +1493,107 @@ function paralDeflect.onAddCondition(creature, condition, isForced)
 	return RETURNVALUE_NOERROR	
 end
 paralDeflect:register()
+
+ImbuablesCache = {
+-- [itemId] = { [imbuId] = 0-7 }
+}
+
+function Item:getAvailableImbuements()
+	-- return cached query
+	local itemId = self:getId()
+	if ImbuablesCache[itemId] then
+		return ImbuablesCache[itemId].tiers, ImbuablesCache[itemId].count
+	end
+	
+	local itemType = self:getType()
+	local itemCategory = itemType:getEquippableCategory()
+	local excludedDamageTypes = 0
+	
+	local abilities = itemType:getAbilities()
+	if abilities.elementDamage > 0 then
+		excludedDamageTypes = bit.addFlag(excludedDamageTypes, abilities.elementType)
+	end	
+	for elementType, amount in pairs(abilities.absorbPercent) do
+		if amount ~= 0 then
+			excludedDamageTypes = bit.addFlag(excludedDamageTypes, 2^(abilities.elementType-1))
+		end
+	end
+	
+	local response = {
+		count = 0,
+		tiers = {}
+	}
+	
+	for imbuId, imbuData in pairs(ImbuingTypes) do
+		if imbuData.tiers then
+			local tierMap = 0
+			local tierCount = 0
+			for tierId, _ in pairs(imbuData.tiers) do
+				tierCount = tierCount + 1
+				tierMap = tierMap + 2^(tierId-1)
+			end
+
+			-- imbuable by id
+			if imbuData.items and table.contains(imbuData.items, itemId) then
+				response.count = response.count + tierCount
+				response.tiers[imbuId] = tierMap
+			end
+			
+			-- imbuable by weaponType or category
+			if
+				response.tiers[imbuId] ~= tierMap and (
+					imbuData.weaponTypes and table.contains(imbuData.weaponTypes, itemType:getWeaponType())
+					or imbuData.categories and table.contains(imbuData.categories, itemCategory)
+				)
+			then
+				if imbuData.subType and (imbuData.type == IMBUEMENT_TYPE_PROTECTION or imbuData.type == IMBUEMENT_TYPE_DAMAGE) then
+					if bit.band(excludedDamageTypes, imbuData.subType) == 0 then
+						-- element imbuement: allow items without element protection/damage only
+						response.count = response.count + tierCount
+						response.tiers[imbuId] = tierMap
+					end
+				elseif imbuData.type == IMBUEMENT_TYPE_SPEED then
+					-- speed imbuement: allow items without speed boost only
+					if abilities.speed == 0 then
+						response.count = response.count + tierCount
+						response.tiers[imbuId] = tierMap
+					end
+				else
+					-- other imbuement: allow
+					response.count = response.count + tierCount
+					response.tiers[imbuId] = tierMap
+				end
+			end
+
+			-- imbuable by callback
+			if response.tiers[imbuId] ~= tierMap and imbuData.callback then
+				tierMap = 0
+				tierCount = 0
+				for tierId, _ in pairs(imbuData.tiers) do
+					if imbuData.callback(self, imbuId, tierId) then
+						tierMap = tierMap + 2^(tierId-1)
+						tierCount = tierCount + 1
+					end
+				end
+				
+				-- allow only selected tiers
+				if tierMap > 0 then
+					response.count = response.count + tierCount
+					response.tiers[imbuId] = tierMap
+				end
+			end
+		end
+	end
+	
+	ImbuablesCache[itemId] = response
+	return response.tiers, response.count
+end
+
+function Item:canReceiveImbuement(imbuId, tier)
+	local itemId = self:getId()
+	if not ImbuablesCache[itemId] then
+		self:getAvailableImbuements()
+	end
+
+	return bit.band(ImbuablesCache[itemId][imbuId] or 0, 2^(tier-1)) ~= 0
+end

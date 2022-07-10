@@ -4,9 +4,9 @@ do
 		-- request forge action
 		if recvbyte == FORGE_REQUEST_USEFORGE then
 			-- check if player is near the forge
-			if not self:isInForge() then
+			if not player:isInForge() then
 				-- player is not close enough to the forge
-				self:sendDefaultForgeError(FORGE_ERROR_NOTINFORGE)
+				player:sendDefaultForgeError(FORGE_ERROR_NOTINFORGE)
 				return
 			end
 			

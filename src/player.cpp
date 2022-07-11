@@ -606,10 +606,6 @@ int32_t Player::getDefaultStats(stats_t stat) const
 
 void Player::addContainer(uint8_t cid, Container* container)
 {
-	if (cid > 0xF) {
-		return;
-	}
-
 	if (container->getID() == ITEM_BROWSEFIELD) {
 		container->incrementReferenceCounter();
 	}
@@ -1159,12 +1155,13 @@ void Player::openSavedContainers()
 		}
 	}
 
+	// to do: improve the code to skip already found containers
 	// fix broken containers when logged in from another location
-	for (uint8_t i = 0; i < 16; i++) {
+	for (uint8_t i = 0; i < 255; i++) {
 		client->sendEmptyContainer(i);
 		client->sendCloseContainer(i);
 	}
-
+	
 	// send actual containers
 	for (auto& it : openContainersList) {
 		addContainer(it.first - 1, it.second);

@@ -211,8 +211,8 @@ Cylinder* Game::internalGetCylinder(Player* player, const Position& pos) const
 	}
 
 	//container
-	if (pos.y & 0x40) {
-		uint8_t from_cid = pos.y & 0x0F;
+	if (pos.y >= 0x40) {
+		uint8_t from_cid = pos.y - 0x40;
 		return player->getContainerByID(from_cid);
 	}
 
@@ -286,8 +286,8 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 	}
 
 	//container
-	if (pos.y & 0x40) {
-		uint8_t fromCid = pos.y & 0x0F;
+	if (pos.y >= 0x40) {
+		uint8_t fromCid = pos.y - 0x40;
 
 		Container* parentContainer = player->getContainerByID(fromCid);
 		if (!parentContainer) {

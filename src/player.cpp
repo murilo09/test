@@ -608,7 +608,7 @@ uint8_t Player::getNextContainerIndex()
 {
 	// generate window id for browse field
 	uint8_t cid = 0;
-	for (uint8_t i = 0; i < 32; ++i) {
+	for (uint8_t i = 0; i < getOpenedContainersLimit(); ++i) {
 		cid = i;
 
 		auto it = openContainers.find(cid);
@@ -1146,6 +1146,11 @@ void Player::sendRemoveContainerItem(const Container* container, uint16_t slot)
 
 void Player::openSavedContainers()
 {
+	// skip if client lost connection
+	if (!client) {
+		return;
+	}
+
 	std::map<uint8_t, Container*> openContainersList;
 
 	for (int32_t i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; i++) {
@@ -1171,18 +1176,20 @@ void Player::openSavedContainers()
 			}
 		}
 	}
-	
+
 	// send saved containers
 	for (auto& it : openContainersList) {
 		addContainer(it.first - 1, it.second);
 		onSendContainer(it.second);
 	}
 
-	// remove missing containers
-	for (uint32_t i = 0; i < 32; ++i) {
-		if (!openContainersList[i+1]) {
-			client->sendEmptyContainer(i);
-			client->sendCloseContainer(i);
+	// fix missing containers for qt client
+	if (getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX) {
+		for (uint32_t i = 0; i < getOpenedContainersLimit(); ++i) {
+			if (!openContainersList[i + 1]) {
+				client->sendEmptyContainer(i);
+				client->sendCloseContainer(i);
+			}
 		}
 	}
 }

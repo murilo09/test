@@ -371,7 +371,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 		int32_t containerId = player->getContainerID(openContainer);
 		if (containerId == -1) {
 			// replace the old container if limit reached
-			if (index == 31) {
+			if (index == player->getOpenedContainersLimit() - 1) {
 				if (Container* oldContainer = player->getContainerByID(index)) {
 					player->onCloseContainer(oldContainer);
 					player->closeContainer(index);

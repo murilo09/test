@@ -2537,7 +2537,7 @@ void Game::playerBrowseField(uint32_t playerId, const Position& pos)
 	if (containerId == -1) {
 		// replace the old container if limit reached
 		uint8_t index = player->getNextContainerIndex();
-		if (index == 31) {
+		if (index == player->getOpenedContainersLimit() - 1) {
 			if (Container* oldContainer = player->getContainerByID(index)) {
 				player->onCloseContainer(oldContainer);
 				player->closeContainer(index);

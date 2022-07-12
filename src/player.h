@@ -261,6 +261,14 @@ class Player final : public Creature, public Cylinder
 			return client->getVersion();
 		}
 
+		uint8_t getOpenedContainersLimit() const {
+			if (!client) {
+				return 32;
+			}
+
+			return getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX ? 32 : 254;
+		}
+
 		bool hasSecureMode() const {
 			return secureMode;
 		}

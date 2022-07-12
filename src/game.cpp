@@ -2532,14 +2532,24 @@ void Game::playerBrowseField(uint32_t playerId, const Position& pos)
 		container = it->second;
 	}
 
-	uint8_t dummyContainerId = 0xF - ((pos.x % 3) * 3 + (pos.y % 3));
-	Container* openContainer = player->getContainerByID(dummyContainerId);
-	if (openContainer) {
-		player->onCloseContainer(openContainer);
-		player->closeContainer(dummyContainerId);
+	// open/close browse field
+	int32_t containerId = player->getContainerID(container);
+	if (containerId == -1) {
+		// replace the old container if limit reached
+		uint8_t index = player->getNextContainerIndex();
+		if (index == 31) {
+			if (Container* oldContainer = player->getContainerByID(index)) {
+				player->onCloseContainer(oldContainer);
+				player->closeContainer(index);
+			}
+		}
+
+		// open a new container
+		player->addContainer(index, container);
+		player->onSendContainer(container);
 	} else {
-		player->addContainer(dummyContainerId, container);
-		player->sendContainer(dummyContainerId, container, false, 0);
+		player->onCloseContainer(container);
+		player->closeContainer(containerId);
 	}
 }
 

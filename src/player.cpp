@@ -604,6 +604,22 @@ int32_t Player::getDefaultStats(stats_t stat) const
 	}
 }
 
+uint8_t Player::getNextContainerIndex()
+{
+	// generate window id for browse field
+	uint8_t cid = 0;
+	for (uint8_t i = 0; i < 32; ++i) {
+		cid = i;
+
+		auto it = openContainers.find(cid);
+		if (it == openContainers.end()) {
+			break;
+		}
+	}
+
+	return cid;
+}
+
 void Player::addContainer(uint8_t cid, Container* container)
 {
 	if (container->getID() == ITEM_BROWSEFIELD) {
@@ -614,6 +630,7 @@ void Player::addContainer(uint8_t cid, Container* container)
 	if (it != openContainers.end()) {
 		OpenContainer& openContainer = it->second;
 		Container* oldContainer = openContainer.container;
+
 		if (oldContainer->getID() == ITEM_BROWSEFIELD) {
 			oldContainer->decrementReferenceCounter();
 		}
@@ -1154,18 +1171,19 @@ void Player::openSavedContainers()
 			}
 		}
 	}
-
-	// to do: improve the code to skip already found containers
-	// fix broken containers when logged in from another location
-	for (uint8_t i = 0; i < 255; i++) {
-		client->sendEmptyContainer(i);
-		client->sendCloseContainer(i);
-	}
 	
-	// send actual containers
+	// send saved containers
 	for (auto& it : openContainersList) {
 		addContainer(it.first - 1, it.second);
 		onSendContainer(it.second);
+	}
+
+	// remove missing containers
+	for (uint32_t i = 0; i < 32; ++i) {
+		if (!openContainersList[i+1]) {
+			client->sendEmptyContainer(i);
+			client->sendCloseContainer(i);
+		}
 	}
 }
 

@@ -318,6 +318,7 @@ class Player final : public Creature, public Cylinder
 		}
 		uint32_t getIP() const;
 
+		uint8_t getNextContainerIndex();
 		void addContainer(uint8_t cid, Container* container);
 		void closeContainer(uint8_t cid);
 		void setContainerIndex(uint8_t cid, uint16_t index);

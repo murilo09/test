@@ -177,5 +177,5 @@ startupDatabaseOptimization = false
 -- Status Server Information
 ownerName = ""
 ownerEmail = ""
-url = "https://otland.net/"
-location = "Sweden"
+url = "https://discord.gg/otacademy"
+location = "Not Specified"

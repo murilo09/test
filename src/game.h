@@ -344,6 +344,8 @@ class Game
 		void playerRequestChannels(uint32_t playerId);
 		void playerOpenChannel(uint32_t playerId, uint16_t channelId);
 		void playerCloseChannel(uint32_t playerId, uint16_t channelId);
+		void playerEditGuildMotd(uint32_t playerId);
+		void playerSaveGuildMotd(uint32_t playerId, const std::string& text);
 		void playerOpenPrivateChannel(uint32_t playerId, std::string receiver);
 		void playerCloseNpcChannel(uint32_t playerId);
 		void playerReceivePing(uint32_t playerId);
@@ -478,6 +480,7 @@ class Game
 
 		void loadMotdNum();
 		void saveMotdNum() const;
+		void saveGuildMotd(const Guild* guild) const;
 		const std::string& getMotdHash() const { return motdHash; }
 		uint32_t getMotdNum() const { return motdNum; }
 		void incrementMotdNum() { motdNum++; }

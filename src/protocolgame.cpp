@@ -588,8 +588,8 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x98: parseOpenChannel(msg); break;
 		case 0x99: parseCloseChannel(msg); break;
 		case 0x9A: parseOpenPrivateChannel(msg); break;
-		//case 0x9B: break; // request edit guild motd (scripted)
-		//case 0x9C: breal; // set new guild motd (scripted)
+		case 0x9B: addGameTask([=, playerID = player->getID()]() { g_game.playerEditGuildMotd(playerID); }); break;
+		case 0x9C: parseSaveGuildMotd(msg); break;
 		case 0x9E: addGameTask([playerID = player->getID()]() { g_game.playerCloseNpcChannel(playerID); }); break;
 		case 0xA0: parseFightModes(msg); break;
 		case 0xA1: parseAttack(msg); break;
@@ -871,6 +871,16 @@ void ProtocolGame::parseCloseChannel(NetworkMessage& msg)
 		channelID = CHANNEL_GUILD;
 	}
 	addGameTask([=, playerID = player->getID()]() { g_game.playerCloseChannel(playerID, channelID); });
+}
+
+void ProtocolGame::parseSaveGuildMotd(NetworkMessage& msg)
+{
+	std::string text = msg.getString();
+	if (text.length() > 255) {
+		return;
+	}
+
+	addGameTask([=, playerID = player->getID(), text = std::move(text)]() { g_game.playerSaveGuildMotd(playerID, text); });
 }
 
 void ProtocolGame::parseOpenPrivateChannel(NetworkMessage& msg)
@@ -2607,6 +2617,14 @@ void ProtocolGame::sendFYIBox(const std::string& message)
 	NetworkMessage msg;
 	msg.addByte(0x15);
 	msg.addString(message);
+	writeToOutputBuffer(msg);
+}
+
+void ProtocolGame::sendGuildMotdEditDialog(const std::string& currentMotd)
+{
+	NetworkMessage msg;
+	msg.addByte(0xAE);
+	msg.addString(currentMotd);
 	writeToOutputBuffer(msg);
 }
 

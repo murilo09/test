@@ -162,6 +162,7 @@ class ProtocolGame final : public Protocol
 		void parseOpenChannel(NetworkMessage& msg);
 		void parseOpenPrivateChannel(NetworkMessage& msg);
 		void parseCloseChannel(NetworkMessage& msg);
+		void parseSaveGuildMotd(NetworkMessage& msg);
 
 		//Send functions
 		void sendChannelMessage(const std::string& author, const std::string& text, MessageClasses type, uint16_t channel);
@@ -175,6 +176,7 @@ class ProtocolGame final : public Protocol
 		void sendNamedPrivateMessage(const std::string& speaker, MessageClasses type, const std::string& text);
 		void sendIcons(uint32_t icons);
 		void sendFYIBox(const std::string& message);
+		void sendGuildMotdEditDialog(const std::string& currentMotd);
 
 		void sendDistanceShoot(const Position& from, const Position& to, uint8_t type);
 		void sendMagicEffect(const Position& pos, uint8_t type);

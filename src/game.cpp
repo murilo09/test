@@ -2008,6 +2008,77 @@ void Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 	g_chat->removeUserFromChannel(*player, channelId);
 }
 
+void Game::playerEditGuildMotd(uint32_t playerId)
+{
+	// check if player object is still valid
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	// check guild permissions
+	Guild* guild = player->getGuild();
+	if (!(guild && player->isGuildLeader())) {
+		player->sendCancelMessage(RETURNVALUE_NOTPOSSIBLE);
+		return;
+	}
+
+	// send motd edit form
+	player->editGuildMotd(guild->getMotd());
+}
+
+void Game::playerSaveGuildMotd(uint32_t playerId, const std::string& text)
+{
+	// check if player object is still valid
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// reset afk timer
+	player->resetIdleTime();
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	// check guild permissions (again)
+	Guild* guild = player->getGuild();
+	if (!(guild && player->isGuildLeader())) {
+		player->sendCancelMessage(RETURNVALUE_NOTPOSSIBLE);
+		return;
+	}
+
+	// set guild motd
+	// to do: put an event here
+	guild->setMotd(text);
+	guild->saveMotd();
+
+	// broadcast new guild motd
+	ChatChannel* channel = g_chat->getChannel(*player, CHANNEL_GUILD);
+	if (channel) {
+		TextMessage messageLeader(MESSAGE_GUILD, "Message of the Day: " + text);
+		messageLeader.channelId = CHANNEL_GUILD_LEADER;
+
+		TextMessage messageMember(MESSAGE_GUILD, "Message of the Day: " + text);
+		messageMember.channelId = CHANNEL_GUILD;
+
+		for (const auto& channelUser : channel->getUsers()) {
+			channelUser.second->sendTextMessage(channelUser.second->isGuildLeader() ? messageLeader : messageMember);
+		}
+	}
+}
+
 void Game::playerOpenPrivateChannel(uint32_t playerId, std::string receiver)
 {
 	Player* player = getPlayerByID(playerId);

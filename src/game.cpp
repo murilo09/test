@@ -2059,18 +2059,20 @@ void Game::playerSaveGuildMotd(uint32_t playerId, const std::string& text)
 		return;
 	}
 
+	// modify motd if player event is active
+	const std::string& motd = g_events->eventPlayerOnGuildMotdEdit(player, text);
+
 	// set guild motd
-	// to do: put an event here
-	guild->setMotd(text);
+	guild->setMotd(motd);
 	guild->saveMotd();
 
 	// broadcast new guild motd
 	ChatChannel* channel = g_chat->getChannel(*player, CHANNEL_GUILD);
 	if (channel) {
-		TextMessage messageLeader(MESSAGE_GUILD, "Message of the Day: " + text);
+		TextMessage messageLeader(MESSAGE_GUILD, "Message of the Day: " + motd);
 		messageLeader.channelId = CHANNEL_GUILD_LEADER;
 
-		TextMessage messageMember(MESSAGE_GUILD, "Message of the Day: " + text);
+		TextMessage messageMember(MESSAGE_GUILD, "Message of the Day: " + motd);
 		messageMember.channelId = CHANNEL_GUILD;
 
 		for (const auto& channelUser : channel->getUsers()) {

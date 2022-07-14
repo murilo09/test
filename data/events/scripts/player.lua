@@ -360,6 +360,10 @@ function Player:onMinimapQuery(position)
 	self:teleportTo(position)
 end
 
+function Player:onGuildMotdEdit(message)
+	return message
+end
+
 -- begin onConnect
 local function sendForgeTypesAsync(cid)
 	local p = Player(cid)

@@ -62,6 +62,7 @@ class Events
 		int32_t playerOnInspectCompendiumItem = -1;
 		int32_t playerOnMinimapQuery = -1;
 		int32_t playerOnInventoryUpdate = -1;
+		int32_t playerOnGuildMotdEdit = -1;
 
 		int32_t playerOnConnect = -1;
 		int32_t playerOnExtendedProtocol = -1;
@@ -118,6 +119,7 @@ class Events
 		void eventPlayerOnInspectCompendiumItem(Player* player, uint16_t itemId);
 		void eventPlayerOnMinimapQuery(Player* player, const Position& position);
 		void eventPlayerOnInventoryUpdate(Player* player, Item* item, slots_t slot, bool equip);
+		const std::string Events::eventPlayerOnGuildMotdEdit(Player* player, const std::string& message);
 		void eventPlayerOnConnect(Player* player, bool isLogin);
 		void eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message);
 

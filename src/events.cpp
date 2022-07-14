@@ -129,6 +129,8 @@ bool Events::load()
 				info.playerOnMinimapQuery = event;
 			} else if (methodName == "onInventoryUpdate") {
 				info.playerOnInventoryUpdate = event;
+			} else if (methodName == "onGuildMotdEdit") {
+				info.playerOnGuildMotdEdit = event;
 			} else if (methodName == "onConnect") {
 				info.playerOnConnect = event;
 			} else if (methodName == "onExtendedProtocol") {
@@ -1353,6 +1355,40 @@ void Events::eventPlayerOnInventoryUpdate(Player* player, Item* item, slots_t sl
 	LuaScriptInterface::pushBoolean(L, equip);
 
 	scriptInterface.callVoidFunction(4);
+}
+
+const std::string Events::eventPlayerOnGuildMotdEdit(Player* player, const std::string& message)
+{
+	// Player:onGuildMotdEdit(message)
+	if (info.playerOnGuildMotdEdit == -1) {
+		return message;
+	}
+
+	if (!scriptInterface.reserveScriptEnv()) {
+		console::reportOverflow("Events::eventPlayerOnGuildMotdEdit");
+		return message;
+	}
+
+	ScriptEnvironment* env = scriptInterface.getScriptEnv();
+	env->setScriptId(info.playerOnGuildMotdEdit, &scriptInterface);
+
+	lua_State* L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(info.playerOnGuildMotdEdit);
+
+	LuaScriptInterface::pushUserdata<Player>(L, player);
+	LuaScriptInterface::setMetatable(L, -1, "Player");
+
+	LuaScriptInterface::pushString(L, message);
+
+	if (scriptInterface.protectedCall(L, 2, 1) != 0) {
+		LuaScriptInterface::reportError(nullptr, LuaScriptInterface::popString(L));
+	} else {
+		const std::string motd = LuaScriptInterface::getString(L, 1);
+		lua_pop(L, 1);
+		return motd;
+	}
+
+	return message;
 }
 
 void Events::eventPlayerOnConnect(Player* player, bool isLogin)

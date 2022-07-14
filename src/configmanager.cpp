@@ -234,6 +234,7 @@ bool ConfigManager::load(bool isReload)
 	boolean[PLAYER_CONSOLE_LOGS] = getGlobalBoolean(L, "showPlayerLogInConsole", true);
 	boolean[TWO_FACTOR_AUTH] = getGlobalBoolean(L, "enableTwoFactorAuth", false);
 	boolean[EXP_ANALYSER_SEND_TRUE_RAW_EXP] = getGlobalBoolean(L, "analyserSendTrueRawExp", false);
+	boolean[SPAMMABLE_QUICK_LOOT] = getGlobalBoolean(L, "spammableQuickLoot", false);
 
 	string[DEFAULT_PRIORITY] = getGlobalString(L, "defaultPriority", "high");
 	string[SERVER_NAME] = getGlobalString(L, "serverName", "");

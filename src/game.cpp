@@ -2852,6 +2852,15 @@ void Game::playerQuickLoot(uint32_t playerId, const Position& position, uint8_t 
 		return;
 	}
 
+	// prevent request spam
+	if (!g_config.getBoolean(ConfigManager::SPAMMABLE_QUICK_LOOT)) {
+		if (player->canDoAction()) {
+			player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::ACTIONS_DELAY_INTERVAL));
+		} else {
+			return;
+		}
+	}
+
 	if (position.x != 0xFFFF && !Position::areInRange<1, 1, 0>(position, player->getPosition())) {
 		std::vector<Direction> listDir;
 		if (player->getPathTo(position, listDir, 0, 1, true, true)) {

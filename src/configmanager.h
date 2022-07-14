@@ -51,6 +51,7 @@ class ConfigManager
 			PLAYER_CONSOLE_LOGS,
 			TWO_FACTOR_AUTH,
 			EXP_ANALYSER_SEND_TRUE_RAW_EXP,
+			SPAMMABLE_QUICK_LOOT,
 
 			LAST_BOOLEAN_CONFIG /* this must be the last one */
 		};

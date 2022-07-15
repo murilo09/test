@@ -2876,6 +2876,88 @@ void Game::playerQuickLoot(uint32_t playerId, const Position& position, uint8_t 
 	g_events->eventPlayerOnQuickLoot(player, position, stackPos, spriteId);
 }
 
+void Game::playerSetLootContainer(uint32_t playerId, const Position& position, uint8_t lootType)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	if (position.x != 0xFFFF) {
+		// clicked on the floor
+		return;
+	}
+
+	uint8_t fromIndex = 0;
+	if (position.y & 0x40) {
+		fromIndex = position.z;
+	} else {
+		fromIndex = static_cast<uint8_t>(position.y);
+	}
+
+	Thing* thing = internalGetThing(player, position, fromIndex, 0, STACKPOS_MOVE);
+	if (!thing) {
+		return;
+	}
+
+	Item* item = thing->getItem();
+	if (!item) {
+		return;
+	}
+
+	g_events->eventPlayerOnManageLootContainer(player, item, 0, lootType);
+}
+
+void Game::playerManageLootContainer(uint32_t playerId, uint8_t mode, uint8_t subMode)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnManageLootContainer(player, nullptr, mode, subMode);
+}
+
+void Game::playerConfigureQuickLoot(uint32_t playerId, const std::vector<uint16_t> clientLoot, bool isSkipMode)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	// process item list
+	std::vector<uint16_t> serverLoot;
+	for (uint16_t spriteId : clientLoot) {
+		const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+		if (it.id != 0) {
+			serverLoot.push_back(it.id);
+		}
+	}
+
+	// send to lua script
+	g_events->eventPlayerOnSetLootList(player, serverLoot, isSkipMode);
+}
 void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t stackPos,
                               uint32_t tradePlayerId, uint16_t spriteId)
 {

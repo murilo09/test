@@ -364,6 +364,18 @@ function Player:onGuildMotdEdit(message)
 	return message
 end
 
+function Player:onSetLootList(lootList, mode)
+	if EventCallback.onSetLootList then
+		EventCallback.onSetLootList(self, lootList, mode)
+	end
+end
+
+function Player:onManageLootContainer(item, mode, lootType)
+	if EventCallback.onManageLootContainer then
+		EventCallback.onManageLootContainer(self, item, mode, lootType)
+	end
+end
+
 -- begin onConnect
 local function sendForgeTypesAsync(cid)
 	local p = Player(cid)

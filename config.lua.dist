@@ -53,9 +53,12 @@ houseDoorShowPrice = true
 onlyInvitedCanMoveHouseItems = true
 
 -- Item Usage
--- NOTE: if spammableQuickLoot is set to false, timeBetweenActions will be used as cooldown
 timeBetweenActions = 200
 timeBetweenExActions = 1000
+
+-- Quick Loot
+-- NOTE: if spammableQuickLoot is set to false, timeBetweenActions will be used as cooldown
+maxQuickLootListSize = 200
 spammableQuickLoot = false
 
 -- Map

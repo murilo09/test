@@ -579,9 +579,9 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x8C: parseLookAt(msg); break;
 		case 0x8D: parseLookInBattleList(msg); break;
 		case 0x8E: /* join aggression */ break;
-		case 0x8F: parseQuickLoot(msg); break;
-		//case 0x90: break; // select loot container (scripted)
-		//case 0x91: break; // parse loot list (scripted)
+		case 0x8F: parseQuickLoot(msg); break; // loot corpse
+		case 0x90: parseSelectLootContainer(msg);  break; // select loot container
+		case 0x91: parseQuickLootList(msg); break; // loot list configuration
 		//case 0x92: break; // request locker items
 		case 0x96: parseSay(msg); break;
 		case 0x97: addGameTask([playerID = player->getID()]() { g_game.playerRequestChannels(playerID); }); break;
@@ -1199,6 +1199,39 @@ void ProtocolGame::parseQuickLoot(NetworkMessage& msg)
 	uint16_t spriteId = msg.get<uint16_t>();
 
 	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [=, playerID = player->getID()]() { g_game.playerQuickLoot(playerID, pos, stackpos, spriteId); });
+}
+
+void ProtocolGame::parseSelectLootContainer(NetworkMessage& msg)
+{
+	uint8_t mode = msg.getByte();
+	uint8_t lootType = msg.getByte();
+
+	// 0x00 - select loot container
+	// 0x01 - unselect loot container
+	// 0x02 - unused
+	// 0x03 - toggle fallback to main container
+	if (mode == 0x00) {		
+		Position pos = msg.getPosition();
+		msg.get<uint16_t>(); //spriteId
+		msg.getByte(); //containerPos
+		addGameTask([=, playerID = player->getID()]() { g_game.playerSetLootContainer(playerID, pos, lootType); });
+		return;
+	}
+
+	addGameTask([=, playerID = player->getID()]() { g_game.playerManageLootContainer(playerID, mode, lootType); });
+}
+
+void ProtocolGame::parseQuickLootList(NetworkMessage& msg)
+{
+	uint8_t mode = msg.getByte(); // collect/skip listed
+	std::vector<uint16_t> lootItems;
+
+	uint16_t listSize = std::min<uint16_t>(msg.get<uint16_t>(), static_cast<uint16_t>(g_config.getNumber(ConfigManager::MAX_QUICK_LOOT_LIST_SIZE)));
+	for (uint16_t i = 0; i < listSize; ++i) {
+		lootItems.push_back(msg.get<uint16_t>());
+	}
+
+	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [=, playerID = player->getID()]() { g_game.playerConfigureQuickLoot(playerID, lootItems, mode == 0x01); });
 }
 
 void ProtocolGame::parseLookInShop(NetworkMessage& msg)

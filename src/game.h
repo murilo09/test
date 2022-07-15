@@ -369,7 +369,11 @@ class Game
 		void playerMinimapQuery(uint32_t playerId, const Position& position);
 		void playerUpdateHouseWindow(uint32_t playerId, uint8_t listId, uint32_t windowTextId, const std::string& text);
 		void playerWrapItem(uint32_t playerId, const Position& position, uint8_t stackPos, const uint16_t spriteId);
+
 		void playerQuickLoot(uint32_t playerId, const Position& position, uint8_t stackPos, const uint16_t spriteId);
+		void playerSetLootContainer(uint32_t playerId, const Position& position, uint8_t lootType);
+		void playerManageLootContainer(uint32_t playerId, uint8_t mode, uint8_t subMode);
+		void playerConfigureQuickLoot(uint32_t playerId, const std::vector<uint16_t> clientLoot, bool isSkipMode);
 
 		void playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t stackPos,
 		                        uint32_t tradePlayerId, uint16_t spriteId);

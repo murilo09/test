@@ -123,6 +123,7 @@ class ConfigManager
 			QUEST_TRACKER_PREMIUM_LIMIT,
 			MIN_MARKET_FEE,
 			MAX_MARKET_FEE,
+			MAX_QUICK_LOOT_LIST_SIZE,
 
 			LAST_INTEGER_CONFIG /* this must be the last one */
 		};

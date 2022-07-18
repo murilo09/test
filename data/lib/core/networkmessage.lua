@@ -47,6 +47,11 @@ function NetworkMessage:addItemType(itemType)
 		self:addU16(0) -- lookMount
 		self:addByte(0) -- direction
 		self:addByte(0x01) -- isVisible
+
+	-- workaround for protocol 12.9
+	elseif itemType:hasShowCharges() or itemType:hasShowDuration() then
+		self:addU32(0)
+		self:addByte(0)
 	end
 	
 	if itemType:getClassification() > 0 then

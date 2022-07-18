@@ -95,6 +95,14 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 		addByte(0x00); // quiver ammo count
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
+
+	// workaround - showCharges and showDuration will be removed from here once official otb drops
+	} else if (it.showClientCharges || it.showCharges) {
+		add<uint32_t>(it.charges);
+		addByte(0x00);
+	} else if (it.showClientDuration || it.showDuration) {
+		add<uint32_t>(it.decayTime);
+		addByte(0x00);
 	}
 
 	if (it.isPodium()) {
@@ -118,6 +126,15 @@ void NetworkMessage::addItem(const Item* item)
 		addByte(fluidType == 0 ? fluidType : fluidMap[fluidType & 7]);
 	} else if (it.classification > 0) {
 		addByte(item->getIntAttr(ITEM_ATTRIBUTE_TIER)); // item tier (0-10)
+	}
+
+	// workaround - showCharges and showDuration will be removed from here once official otb drops
+	if (it.showClientCharges || it.showCharges) {
+		add<uint32_t>(item->getCharges());
+		addByte(0); // unknown
+	} else if (it.showClientDuration || it.showDuration) {
+		add<uint32_t>(item->getDuration() / 1000);
+		addByte(0); // unknown
 	}
 
 	if (it.type == ITEM_TYPE_CONTAINER || it.type == ITEM_TYPE_DEPOT) {

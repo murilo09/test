@@ -3158,7 +3158,7 @@ void ProtocolGame::sendOutfitWindow()
 	// QT client fix for unmountable looktypes
 	if (player->getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX) {
 		if (!Outfits::getInstance().getOutfitByLookType(player->getSex(), currentOutfit.lookType)) {
-			currentOutfit.lookMount = 0;
+			currentOutfit.lookType = outfits.front().lookType;
 		}
 	}
 

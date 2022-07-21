@@ -107,9 +107,9 @@ cleanProtectionZones = false
 showPlayerLogInConsole = true
 
 -- Unlockable cosmetics
-unlockAllOutfits = true
-unlockAllMounts = true
-unlockAllFamiliars = true
+unlockAllOutfits = false
+unlockAllMounts = false
+unlockAllFamiliars = false
 
 -- false: player will see base exp * stage
 -- true: player will see base monster exp

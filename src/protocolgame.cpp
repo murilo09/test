@@ -531,16 +531,28 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	// cases commented as "(scripted)" are being handled by lua scripts
 	switch (recvbyte) {
+		// 0x00-0x09 - empty
+		// 0x0A - connection (already handled)
+		// 0x0B - connection (already handled)
+		// 0x0C-0x0E - empty
 		case 0x0F: break; // login
+		// 0x10-0x13 - empty
 		case 0x14: addGameTask([thisPtr = getThis()]() { thisPtr->logout(true, false); }); break;
+		// 0x15-0x1B - empty
 		case 0x1C: break; // ping check
 		case 0x1D: addGameTask([playerID = player->getID()]() { g_game.playerReceivePingBack(playerID); }); break;
 		case 0x1E: addGameTask([playerID = player->getID()]() { g_game.playerReceivePing(playerID); }); break;
+		//case 0x1F: break; // client performance logs (deprecated?)
+		// 0x20-0x27 - empty
+		//case 0x28: break; // stash withdraw
+		//case 0x29: break; // stash action
 		//case 0x2A: break; // bestiary tracker
+		//case 0x2A: break; // party hunt analyzer
 		//case 0x2C: break; // team finder (leader)
 		//case 0x2D: break; // team finder (member)
-		//case 0x28: break; // stash withdraw
+		// 0x2E-0x31 - empty
 		case 0x32: parseExtendedOpcode(msg); break; // otclient extended opcode
+		// 0x33-0x63 - empty
 		case 0x64: parseAutoWalk(msg); break;
 		case 0x65: addGameTask([playerID = player->getID()]() { g_game.playerMove(playerID, DIRECTION_NORTH); }); break;
 		case 0x66: addGameTask([playerID = player->getID()]() { g_game.playerMove(playerID, DIRECTION_EAST); }); break;
@@ -551,11 +563,14 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x6B: addGameTask([playerID = player->getID()]() { g_game.playerMove(playerID, DIRECTION_SOUTHEAST); }); break;
 		case 0x6C: addGameTask([playerID = player->getID()]() { g_game.playerMove(playerID, DIRECTION_SOUTHWEST); }); break;
 		case 0x6D: addGameTask([playerID = player->getID()]() { g_game.playerMove(playerID, DIRECTION_NORTHWEST); }); break;
+		// 0x6E - empty
 		case 0x6F: addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [playerID = player->getID()]() { g_game.playerTurn(playerID, DIRECTION_NORTH); }); break;
 		case 0x70: addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [playerID = player->getID()]() { g_game.playerTurn(playerID, DIRECTION_EAST); }); break;
 		case 0x71: addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [playerID = player->getID()]() { g_game.playerTurn(playerID, DIRECTION_SOUTH); }); break;
 		case 0x72: addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [playerID = player->getID()]() { g_game.playerTurn(playerID, DIRECTION_WEST); }); break;
 		case 0x73: parsePlayerMinimapQuery(msg); break; // ctrl+shift+left click on minimap
+		// 0x74-0x75 - empty
+		// case 0x76: break; // character trade ui
 		case 0x77: parseEquipObject(msg); break;
 		case 0x78: parseThrow(msg); break;
 		case 0x79: parseLookInShop(msg); break;
@@ -566,6 +581,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x7E: parseLookInTrade(msg); break;
 		case 0x7F: addGameTask([playerID = player->getID()]() { g_game.playerAcceptTrade(playerID); }); break;
 		case 0x80: addGameTask([playerID = player->getID()]() { g_game.playerCloseTrade(playerID); }); break;
+		// case 0x81: break; // friend system ui
 		case 0x82: parseUseItem(msg); break;
 		case 0x83: parseUseItemEx(msg); break;
 		case 0x84: parseUseWithCreature(msg); break;
@@ -582,7 +598,10 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x8F: parseQuickLoot(msg); break; // loot corpse
 		case 0x90: parseSelectLootContainer(msg);  break; // select loot container
 		case 0x91: parseQuickLootList(msg); break; // loot list configuration
-		//case 0x92: break; // request locker items
+		//case 0x92: break; // depot search 1
+		//case 0x93: break; // depot search 2
+		//case 0x94: break; // depot search 3
+		//case 0x95: break; // depot search (?)
 		case 0x96: parseSay(msg); break;
 		case 0x97: addGameTask([playerID = player->getID()]() { g_game.playerRequestChannels(playerID); }); break;
 		case 0x98: parseOpenChannel(msg); break;
@@ -590,6 +609,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x9A: parseOpenPrivateChannel(msg); break;
 		case 0x9B: addGameTask([=, playerID = player->getID()]() { g_game.playerEditGuildMotd(playerID); }); break;
 		case 0x9C: parseSaveGuildMotd(msg); break;
+		// 0x9D - empty
 		case 0x9E: addGameTask([playerID = player->getID()]() { g_game.playerCloseNpcChannel(playerID); }); break;
 		case 0xA0: parseFightModes(msg); break;
 		case 0xA1: parseAttack(msg); break;
@@ -600,40 +620,63 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xA6: parsePassPartyLeadership(msg); break;
 		case 0xA7: addGameTask([playerID = player->getID()]() { g_game.playerLeaveParty(playerID); }); break;
 		case 0xA8: parseEnableSharedPartyExperience(msg); break;
+		// 0xA9 - disband party (?)
 		case 0xAA: addGameTask([playerID = player->getID()]() { g_game.playerCreatePrivateChannel(playerID); }); break;
 		case 0xAB: parseChannelInvite(msg); break;
 		case 0xAC: parseChannelExclude(msg); break;
+		//case 0xAD: break; // house auction ui
+		//case 0xAE: break; // bosstiary ui
+		//case 0xAF: break; // boss slots ui
+		// 0xB0 - empty
 		//case 0xB1: break; // request highscores
+		// 0xB2-0xBD - empty
 		case 0xBE: addGameTask([playerID = player->getID()]() { g_game.playerCancelAttackAndFollow(playerID); }); break;
 		//case 0xBF: break; // exaltation forge (scripted)
-		//case 0xC7: break; // request tournament leaderboard
+		//case 0xC0: break; //request forge history (scripted)
+		// 0xC1-0xC2 - empty
+		// 0xC3 - tournament ui 1
+		// 0xC4 - tournament ui 2
+		// 0xC5 - empty
+		// 0xC6 - tournament ui 3
+		// 0xC7 - tournament ui 4
+		// 0xC8 - tournament ui 5
 		case 0xC9: /* update tile */ break;
 		case 0xCA: parseUpdateContainer(msg); break;
 		case 0xCB: parseBrowseField(msg); break;
 		case 0xCC: parseSeekInContainer(msg); break;
 		case 0xCD: parseInspectItem(msg); break;
 		//case 0xCE: break; // allow everyone to inspect me (to do)
-		//case 0xC0: break; //request forge history (scripted)
+		//case 0xCF: break; // blessings UI
 		case 0xD0: parseQuestTracker(msg); break;
+		// 0xD1 - empty/unknown
 		case 0xD2: addGameTask([playerID = player->getID()]() { g_game.playerRequestOutfit(playerID); }); break;
 		case 0xD3: parseSetOutfit(msg); break;
 		case 0xD4: parseToggleMount(msg); break;
 		//case 0xD5: break; // inspect character feature: client preferences
 		//case 0xD6: break; // imbuing(?)
 		//case 0xD7: break; // imbuing(?)
+		//case 0xD8: break; // daily reward 1
+		//case 0xD9: break; // daily reward 2
+		//case 0xDA: break; // daily reward 3
+		//case 0xDB: break; // world map (large) action
 		case 0xDC: parseAddVip(msg); break;
 		case 0xDD: parseRemoveVip(msg); break;
 		case 0xDE: parseEditVip(msg); break;
-		//case 0xDF: break; // premium shop (?)
-		//case 0xE0: break; // premium shop (?)
+		//case 0xDF: break; // vip group
+		//case 0xE0: break; // game news(?)
 		//case 0xE1: break; // bestiary 1 (scripted)
 		//case 0xE2: break; // bestiary 2 (scripted)
 		//case 0xE3: break; // bestiary 3 (scripted)
-		//case 0xE4: break; // buy charm rune
+		//case 0xE4: break; // buy charm
 		//case 0xE5: break; // request character info (in-game knowledge base) (scripted)
 		case 0xE6: parseBugReport(msg); break;
 		case 0xE7: /* thank you */ break;
 		case 0xE8: parseDebugAssert(msg); break;
+		// 0xE9 - unknown
+		// 0xEA - unknown
+		// 0xEB - prey
+		// 0xEC - rename hireling
+		case 0xED: /* request resource balance */ break;
 		case 0xEE: addGameTask([playerID = player->getID()]() { g_game.playerSay(playerID, 0, TALKTYPE_SAY, "", "hi"); }); break;
 		//case 0xEF: break; // request store coins transfer
 		case 0xF0: addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, [playerID = player->getID()]() { g_game.playerShowQuestLog(playerID); }); break;
@@ -651,6 +694,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		//case 0xFC: break; // store window buy
 		//case 0xFD: break; // store window history 1
 		//case 0xFE: break; // store window history 2
+		//0xFF - empty
 
 		default:
 			// std::cout << "[DEBUG]: Player " << player->getName() << " has sent an unknown packet header: 0x" << std::hex << static_cast<uint16_t>(recvbyte) << std::dec << "!" << std::endl;

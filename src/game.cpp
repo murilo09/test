@@ -3770,21 +3770,24 @@ void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool mountRand
 		return;
 	}
 
+	// prevent setting a mount to unmountable looktypes
 	const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(player->getSex(), outfit.lookType);
 	if (!playerOutfit) {
 		outfit.lookMount = 0;
 	}
 
-	if (outfit.lookMount != 0) {
-		Mount* mount = mounts.getMountByClientID(outfit.lookMount);
-		if (!mount) {
-			return;
-		}
-
+	// check if the player has a mount
+	Mount* mount = mounts.getMountByClientID(outfit.lookMount);
+	if (mount) {
 		if (!player->hasMount(mount)) {
-			return;
+			outfit.lookMount = 0;
 		}
+	} else {
+		outfit.lookMount = 0;
+	}
 
+	// toggle mount
+	if (mount && outfit.lookMount != 0) {
 		int32_t speedChange = mount->speed;
 		if (player->isMounted()) {
 			Mount* prevMount = mounts.getMountByID(player->getCurrentMount());
@@ -3808,13 +3811,24 @@ void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool mountRand
 
 	if (player->canWear(outfit.lookType, outfit.lookAddons)) {
 		player->defaultOutfit = outfit;
-
-		if (player->hasCondition(CONDITION_OUTFIT)) {
-			return;
+	} else {
+		// turn packet spoofers into unmounted noobs
+		uint16_t lookType = 128;
+		const auto& outfits = Outfits::getInstance().getOutfits(player->getSex());
+		if (outfits.size() > 0) {
+			lookType = outfits.front().lookType;
 		}
 
-		internalCreatureChangeOutfit(player, outfit);
+		outfit.lookType = lookType;
+		outfit.lookAddons = 0;
+		player->defaultOutfit = outfit;
 	}
+
+	if (player->hasCondition(CONDITION_OUTFIT)) {
+		return;
+	}
+
+	internalCreatureChangeOutfit(player, outfit);
 
 	if (player->isMounted()) {
 		player->onChangeZone(player->getZone());

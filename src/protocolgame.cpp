@@ -3147,10 +3147,19 @@ void ProtocolGame::sendOutfitWindow()
 
 	// get current outfit info
 	Outfit_t currentOutfit = player->getDefaultOutfit();
+
+	// default outfit unavailable
 	if (currentOutfit.lookType == 0) {
 		Outfit_t newOutfit;
 		newOutfit.lookType = outfits.front().lookType;
 		currentOutfit = newOutfit;
+	}
+
+	// QT client fix for unmountable looktypes
+	if (player->getOperatingSystem() < CLIENTOS_OTCLIENT_LINUX) {
+		if (!Outfits::getInstance().getOutfitByLookType(player->getSex(), currentOutfit.lookType)) {
+			currentOutfit.lookMount = 0;
+		}
 	}
 
 	// get current mount info

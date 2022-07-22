@@ -536,7 +536,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 		// store / ok button (relog)
 		if (recvbyte == 0x0F) {
-			login(lastName, lastAccountId, lastOperatingSystem);
+			addGameTask([=, thisPtr = getThis(), characterName = std::move(lastName)]() { thisPtr->login(characterName, lastAccountId, lastOperatingSystem); });
 			return;
 		}
 

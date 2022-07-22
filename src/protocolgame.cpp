@@ -518,7 +518,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 	uint8_t recvbyte = msg.getByte();
 
 	if (!player) {
-		std::cout << "deleted 0x" << std::hex << static_cast<int>(recvbyte) << std::endl;
 		if (recvbyte == 0x0F) {
 			disconnect();
 		}
@@ -528,7 +527,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	//a dead player can not perform actions
 	if (player->isRemoved() || player->getHealth() <= 0) {
-		std::cout << "0x" << std::hex << static_cast<int>(recvbyte) << std::endl;
 
 		// ping check
 		if (recvbyte == 0x1D) {

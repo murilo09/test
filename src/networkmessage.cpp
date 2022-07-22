@@ -106,8 +106,9 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}
 
 	if (it.isPodium()) {
-		add<uint16_t>(0); //looktype
-		add<uint16_t>(0); //lookmount
+		add<uint16_t>(0); //lookType
+		add<uint16_t>(0); //lookTypeEx
+		add<uint16_t>(0); //lookMount
 		addByte(2); //direction
 		addByte(0x01); //is visible (bool)
 	}
@@ -173,8 +174,11 @@ void NetworkMessage::addItem(const Item* item)
 				addByte(outfit.lookLegs);
 				addByte(outfit.lookFeet);
 				addByte(outfit.lookAddons);
+			} else {
+				add<uint16_t>(outfit.lookTypeEx);
 			}
 		} else {
+			add<uint16_t>(0);
 			add<uint16_t>(0);
 		}
 

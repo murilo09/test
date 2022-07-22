@@ -44,6 +44,7 @@ function NetworkMessage:addItemType(itemType)
 		self:addByte(0x00) -- is quiver (bool), requires u32 ammo count if true
 	elseif itemType:isPodium() then
 		self:addU16(0) -- lookType
+		self:addU16(0) -- lookTypeEx
 		self:addU16(0) -- lookMount
 		self:addByte(0) -- direction
 		self:addByte(0x01) -- isVisible

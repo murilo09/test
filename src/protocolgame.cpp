@@ -215,6 +215,10 @@ void ProtocolGame::login(const std::string& name, uint32_t accountId, OperatingS
 		player->lastLoginSaved = std::max<time_t>(time(nullptr), player->lastLoginSaved + 1);
 		acceptPackets = true;
 
+		lastName = name;
+		lastAccountId = accountId;
+		lastOperatingSystem = operatingSystem;
+
 		addGameTask([=, playerID = player->getID()]() { g_game.playerConnect(playerID, isLogin); });
 	} else {
 		if (eventConnect != 0 || !g_config.getBoolean(ConfigManager::REPLACE_KICK_ON_LOGIN)) {
@@ -233,6 +237,10 @@ void ProtocolGame::login(const std::string& name, uint32_t accountId, OperatingS
 		} else {
 			connect(foundPlayer->getID(), operatingSystem);
 		}
+
+		lastName = name;
+		lastAccountId = accountId;
+		lastOperatingSystem = operatingSystem;
 
 		addGameTask([=, playerID = foundPlayer->getID()]() { g_game.playerConnect(playerID, isLogin); });
 	}
@@ -510,6 +518,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 	uint8_t recvbyte = msg.getByte();
 
 	if (!player) {
+		std::cout << "deleted 0x" << std::hex << static_cast<int>(recvbyte) << std::endl;
 		if (recvbyte == 0x0F) {
 			disconnect();
 		}
@@ -519,11 +528,21 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	//a dead player can not perform actions
 	if (player->isRemoved() || player->getHealth() <= 0) {
-		if (recvbyte == 0x0F) {
-			disconnect();
+		std::cout << "0x" << std::hex << static_cast<int>(recvbyte) << std::endl;
+
+		// ping check
+		if (recvbyte == 0x1D) {
+			sendPingBack();
 			return;
 		}
 
+		// store / ok button (relog)
+		if (recvbyte == 0x0F) {
+			login(lastName, lastAccountId, lastOperatingSystem);
+			return;
+		}
+
+		// cancel (logout)
 		if (recvbyte != 0x14) {
 			return;
 		}

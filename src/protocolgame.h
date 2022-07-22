@@ -346,6 +346,10 @@ class ProtocolGame final : public Protocol
 
 		bool debugAssertSent = false;
 		bool acceptPackets = false;
+
+		std::string lastName;
+		uint32_t lastAccountId = 0;
+		OperatingSystem_t lastOperatingSystem = CLIENTOS_NONE;
 };
 
 #endif

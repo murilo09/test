@@ -248,6 +248,234 @@ void ProtocolGame::login(const std::string& name, uint32_t accountId, OperatingS
 	OutputMessagePool::getInstance().addProtocolToAutosend(shared_from_this());
 }
 
+
+void ProtocolGame::sendRelogCancel(const std::string& msg, bool isRelog)
+{
+	if (isRelog) {
+		disconnectClient(msg);
+		return;
+	}
+
+	player->sendCancelMessage(msg);
+}
+
+void ProtocolGame::fastRelog(const std::string& otherPlayerName)
+{
+	//dispatcher thread
+	if (!player || player->isRemoved()) {
+		return;
+	}
+
+	// get client type
+	OperatingSystem_t operatingSystem = player->getOperatingSystem();
+
+	// read requested player info
+	bool isRelog = false;
+	Player* otherPlayer = g_game.getPlayerByName(otherPlayerName);
+	if (otherPlayer) {
+		if (otherPlayer->isRemoved()) {
+			player->sendCancelMessage("An error occured. Please try again later.");
+			return;
+		}
+
+		// handle relog to same character situation
+		if (player->getID() == otherPlayer->getID()) {
+			// send logout effect
+			if (!player->isInGhostMode()) {
+				g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+			}
+
+			// unlink player client
+			player->client = nullptr;
+
+			// logout
+			g_game.removeCreature(player);
+			otherPlayer = nullptr;
+			isRelog = true;
+		}
+	}
+
+	// handle login situation
+	bool isLogin = !otherPlayer || g_config.getBoolean(ConfigManager::ALLOW_CLONES);
+	if (isLogin) {
+		otherPlayer = new Player(nullptr);
+		otherPlayer->setName(otherPlayerName);
+
+		otherPlayer->incrementReferenceCounter();
+		otherPlayer->setID();
+
+		if (isRelog) {
+			// use a new object instead of removed one
+			this->player = otherPlayer;
+			otherPlayer->client = getThis();
+		}
+
+		// fetch base player info from the database
+		if (!IOLoginData::preloadPlayer(otherPlayer, otherPlayerName)) {
+			sendRelogCancel("Your character could not be loaded.", isRelog);
+			return;
+		}
+
+		// check namelock
+		if (IOBan::isPlayerNamelocked(otherPlayer->getGUID())) {
+			sendRelogCancel("Your character has been namelocked.", isRelog);
+			return;
+		}
+
+		// server closed
+		if (!otherPlayer->hasFlag(PlayerFlag_CanAlwaysLogin)) {
+			GameState_t gameState = g_game.getGameState();
+			if (gameState == GAME_STATE_CLOSING) {
+				sendRelogCancel("The game is just going down.\nPlease try again later.", isRelog);
+				return;
+			} else if (gameState == GAME_STATE_CLOSED) {
+				sendRelogCancel("Server is currently closed.\nPlease try again later.", isRelog);
+				return;
+			}
+		}
+
+		// disconnect if banned
+		if (!otherPlayer->hasFlag(PlayerFlag_CannotBeBanned)) {
+			BanInfo banInfo;
+			if (IOBan::isAccountBanned(otherPlayer->getAccount(), banInfo)) {
+				if (banInfo.reason.empty()) {
+					banInfo.reason = "(none)";
+				}
+
+				if (banInfo.expiresAt > 0) {
+					disconnectClient(fmt::format("Your account has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}", formatDateShort(banInfo.expiresAt), banInfo.bannedBy, banInfo.reason));
+				} else {
+					disconnectClient(fmt::format("Your account has been permanently banned by {:s}.\n\nReason specified:\n{:s}", banInfo.bannedBy, banInfo.reason));
+				}
+
+				if (!isRelog) {
+					// send logout effect
+					if (!player->isInGhostMode()) {
+						g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+					}
+
+					// remove
+					g_game.removeCreature(player);
+				}
+
+				return;
+			}
+		}
+	}
+
+	// handle same char relog situation
+	bool sameClient = otherPlayer->client && (otherPlayer->client == getThis());
+	if (!sameClient) {
+		// logged from another place - check config value
+		if (!g_config.getBoolean(ConfigManager::REPLACE_KICK_ON_LOGIN)) {
+			player->sendCancelMessage("You are already logged in.");
+			return;
+		}
+
+		// disconnect other client
+		otherPlayer->disconnect();
+	}
+
+	// logout (already done in relog situation)
+	if (!isRelog) {
+		// send logout effect
+		if (!player->isInGhostMode()) {
+			g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+		}
+
+		// unlink player client
+		player->client = nullptr;
+
+		// logout the current character
+		g_game.removeCreature(player);
+	}
+
+	// make sure the camera will follow the player
+	knownCreatureSet.clear();
+
+	// copy client information
+	otherPlayer->setOperatingSystem(operatingSystem);
+
+	// set player ip
+	otherPlayer->lastIP = getIP();
+
+	// restore client communication
+	otherPlayer->client = getThis();
+	this->player = otherPlayer;
+
+	if (isLogin) {
+		// multiclient check
+		if (g_config.getBoolean(ConfigManager::ONE_PLAYER_ON_ACCOUNT) && otherPlayer->getAccountType() < ACCOUNT_TYPE_GAMEMASTER && g_game.getPlayerByAccount(otherPlayer->getAccount())) {
+			disconnectClient("You may only login with one character\nof your account at the same time.");
+			return;
+		}
+
+		// fetch full player info
+		if (!IOLoginData::loadPlayerById(otherPlayer, otherPlayer->getGUID())) {
+			disconnectClient("Your character could not be loaded.");
+			return;
+		}
+
+		// place player on the map
+		if (!g_game.placeCreature(otherPlayer, otherPlayer->getLoginPosition())) {
+			if (!g_game.placeCreature(otherPlayer, otherPlayer->getTemplePosition(), false, true)) {
+				disconnectClient("Temple position is wrong. Contact the administrator.");
+				return;
+			}
+		}
+
+		// enable otc feature
+		if (operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
+			otherPlayer->registerCreatureEvent("ExtendedOpcode");
+		}
+
+		// initialize account currencies
+		addGameTask([=, playerGUID = otherPlayer->getGUID()]() { g_game.playerRegisterCurrencies(playerGUID); });
+
+		// update last login info
+		otherPlayer->lastLoginSaved = std::max<time_t>(time(nullptr), otherPlayer->lastLoginSaved + 1);
+	}
+
+	// send player stats
+	sendStats(); // hp, cap, level, xp rate, etc.
+	sendSkills(); // skills and special skills
+	player->sendIcons(); // active conditions
+
+	// send client info
+	sendClientFeatures(); // player speed, bug reports, store url, pvp mode, etc
+	sendBasicData(); // premium account, vocation, known spells, prey system status, magic shield status
+	sendItems(); // send carried items for action bars
+
+	// send game screen
+	sendMapDescription(player->getPosition());
+
+	// send login effect
+	if (isLogin && !player->isInGhostMode()) {
+		g_game.addMagicEffect(player->getPosition(), CONST_ME_TELEPORT);
+	}
+
+	// send inventory
+	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
+		sendInventoryItem(static_cast<slots_t>(i), player->getInventoryItem(static_cast<slots_t>(i)));
+	}
+	sendInventoryItem(CONST_SLOT_STORE_INBOX, player->getStoreInbox()->getItem());
+
+	// player light level
+	sendCreatureLight(dynamic_cast<const Creature*>(player));
+
+	// vip list
+	sendVIPEntries();
+
+	// opened containers
+	player->openSavedContainers();
+
+	// remember last relog
+	lastName = otherPlayerName;
+
+	// event onConnect
+	addGameTask([=, playerID = otherPlayer->getID()]() { g_game.playerConnect(playerID, isLogin); });
+}
+
 void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 {
 	eventConnect = 0;

@@ -278,6 +278,11 @@ void ProtocolGame::fastRelog(const std::string& otherPlayerName)
 			return;
 		}
 
+		if (player->getAccount() != otherPlayer->getAccount()) {
+			player->sendCancelMessage("Your character could not be loaded.");
+			return;
+		}
+
 		// handle relog to same character situation
 		if (player->getID() == otherPlayer->getID()) {
 			// send logout effect
@@ -313,6 +318,12 @@ void ProtocolGame::fastRelog(const std::string& otherPlayerName)
 		// fetch base player info from the database
 		if (!IOLoginData::preloadPlayer(otherPlayer, otherPlayerName)) {
 			sendRelogCancel("Your character could not be loaded.", isRelog);
+			return;
+		}
+
+		// check accounts
+		if (player->getAccount() != otherPlayer->getAccount()) {
+			player->sendCancelMessage("Your character could not be loaded.");
 			return;
 		}
 

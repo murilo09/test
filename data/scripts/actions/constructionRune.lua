@@ -1,16 +1,16 @@
 local function forceTakeItem(player, targetItem)
 	local newItem = targetItem:clone()
+	if targetItem:isTeleport() then
+		newItem:setDestination(targetItem:getDestination())
+	elseif targetItem:isPodium() then
+		newItem:setOutfit(targetItem:getOutfit())
+		newItem:setFlag(PODIUM_SHOW_PLATFORM, targetItem:hasFlag(PODIUM_SHOW_PLATFORM))
+		newItem:setFlag(PODIUM_SHOW_OUTFIT, targetItem:hasFlag(PODIUM_SHOW_OUTFIT))
+		newItem:setFlag(PODIUM_SHOW_MOUNT, targetItem:hasFlag(PODIUM_SHOW_MOUNT))
+		newItem:setDirection(targetItem:getDirection())
+	end	
+	
 	if targetItem:remove() then
-		if targetItem:isTeleport() then
-			newItem:setDestination(targetItem:getDestination())
-		elseif targetItem:isPodium() then
-			newItem:setOutfit(targetItem:getOutfit())
-			newItem:setFlag(PODIUM_SHOW_PLATFORM, targetItem:hasFlag(PODIUM_SHOW_PLATFORM))
-			newItem:setFlag(PODIUM_SHOW_OUTFIT, targetItem:hasFlag(PODIUM_SHOW_OUTFIT))
-			newItem:setFlag(PODIUM_SHOW_MOUNT, targetItem:hasFlag(PODIUM_SHOW_MOUNT))
-			newItem:setDirection(targetItem:getDirection())
-		end
-
 		player:getStoreInbox():addItemEx(newItem, -1, bit.bor(FLAG_NOLIMIT, FLAG_IGNORENOTPICKUPABLE))
 		return true
 	end

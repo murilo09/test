@@ -756,33 +756,39 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	uint8_t recvbyte = msg.getByte();
 
-	if (!player) {
-		if (recvbyte == 0x0F) {
+	//a dead player can not perform actions
+	if (!player || player->isRemoved() || player->getHealth() <= 0) {
+		// handle user afking on death screen
+		if (OTSYS_TIME() > lastDeathTime) {
+			sendSessionEnd(SESSION_END_LOGOUT);
+			disconnect();
+			return;
+		}
+
+		// "you are dead" window
+		switch (recvbyte) {
+			case 0x0F:
+				// "ok" or "store" button
+				addGameTask([=, thisPtr = getThis(), characterName = std::move(lastName)]() { thisPtr->login(characterName, lastAccountId, lastOperatingSystem); });
+				break;
+			case 0x14:
+				// "cancel" (logout)
+				sendSessionEnd(SESSION_END_LOGOUT);
+				disconnect();
+				break;
+			case 0x1D:
+				// ping check
+				sendPingBack();
+				break;
+			default:
+				break;
+		}
+
+		if (msg.isOverrun()) {
 			disconnect();
 		}
 
 		return;
-	}
-
-	//a dead player can not perform actions
-	if (player->isRemoved() || player->getHealth() <= 0) {
-
-		// ping check
-		if (recvbyte == 0x1D) {
-			sendPingBack();
-			return;
-		}
-
-		// store / ok button (relog)
-		if (recvbyte == 0x0F) {
-			addGameTask([=, thisPtr = getThis(), characterName = std::move(lastName)]() { thisPtr->login(characterName, lastAccountId, lastOperatingSystem); });
-			return;
-		}
-
-		// cancel (logout)
-		if (recvbyte != 0x14) {
-			return;
-		}
 	}
 
 	// cases commented as "(scripted)" are being handled by lua scripts

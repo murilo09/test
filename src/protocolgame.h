@@ -349,9 +349,11 @@ class ProtocolGame final : public Protocol
 		bool debugAssertSent = false;
 		bool acceptPackets = false;
 
+		// player data which is still needed after player object destruction
 		std::string lastName;
 		uint32_t lastAccountId = 0;
 		OperatingSystem_t lastOperatingSystem = CLIENTOS_NONE;
+		int64_t lastDeathTime = 0;
 };
 
 #endif

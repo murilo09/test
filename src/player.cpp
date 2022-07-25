@@ -2352,7 +2352,12 @@ void Player::death(Creature* lastHitCreature)
 
 		sendStats();
 		sendSkills();
+
+		// send death screen
 		sendReLoginWindow(unfairFightReduction);
+
+		// 30 seconds to answer the death screen
+		client->lastDeathTime = OTSYS_TIME() + 30000;
 
 		if (getSkull() == SKULL_BLACK) {
 			health = 40;

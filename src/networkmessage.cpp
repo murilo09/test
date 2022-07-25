@@ -96,11 +96,11 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
 
-	// workaround - showCharges and showDuration will be removed from here once official otb drops
-	} else if (it.showClientCharges || it.showCharges) {
+	// charges/duration indicators
+	} else if (it.showClientCharges) {
 		add<uint32_t>(it.charges);
 		addByte(0x00);
-	} else if (it.showClientDuration || it.showDuration) {
+	} else if (it.showClientDuration) {
 		add<uint32_t>(it.decayTime);
 		addByte(0x00);
 	}
@@ -129,11 +129,11 @@ void NetworkMessage::addItem(const Item* item)
 		addByte(item->getIntAttr(ITEM_ATTRIBUTE_TIER)); // item tier (0-10)
 	}
 
-	// workaround - showCharges and showDuration will be removed from here once official otb drops
-	if (it.showClientCharges || it.showCharges) {
+	// charges/duration indicators
+	if (it.showClientCharges) {
 		add<uint32_t>(item->getCharges());
 		addByte(0); // unknown
-	} else if (it.showClientDuration || it.showDuration) {
+	} else if (it.showClientDuration) {
 		add<uint32_t>(item->getDuration() / 1000);
 		addByte(0); // unknown
 	}

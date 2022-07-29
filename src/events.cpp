@@ -1487,7 +1487,7 @@ void Events::eventPlayerOnManageLootContainer(Player* player, Item* item, uint8_
 
 void Events::eventPlayerOnFuseItems(Player* player, const ItemType* fromItemType, uint8_t fromTier, const ItemType* toItemType, bool successCore, bool tierLossCore)
 {
-	// Player:onFuseItems(player, fromItemType, fromTier, toItemType, successCore, tierLossCore)
+	// Player:onFuseItems(fromItemType, fromTier, toItemType, successCore, tierLossCore)
 	if (info.playerOnFuseItems == -1) {
 		return;
 	}
@@ -1529,7 +1529,7 @@ void Events::eventPlayerOnFuseItems(Player* player, const ItemType* fromItemType
 
 void Events::eventPlayerOnTransferTier(Player* player, const ItemType* fromItemType, uint8_t fromTier, const ItemType* toItemType)
 {
-	// Player:onTransferTier(player, fromItemType, fromTier, toItemType)
+	// Player:onTransferTier(fromItemType, fromTier, toItemType)
 	if (info.playerOnTransferTier == -1) {
 		return;
 	}

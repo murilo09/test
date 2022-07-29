@@ -376,6 +376,31 @@ function Player:onManageLootContainer(item, mode, lootType)
 	end
 end
 
+function Player:onFuseItems(fromItemType, fromTier, toItemType, successCore, tierLossCore)
+	if EventCallback.onFuseItems then
+		EventCallback.onFuseItems(self, fromItemType, fromTier, toItemType, successCore, tierLossCore)
+	end
+end
+
+function Player:onTransferTier(fromItemType, fromTier, toItemType)
+	if EventCallback.onTransferTier then
+		EventCallback.onTransferTier(self, fromItemType, fromTier, toItemType)
+	end
+end
+
+function Player:onForgeConversion(conversionType)
+	if EventCallback.onForgeConversion then
+		EventCallback.onForgeConversion(self, conversionType)
+	end
+end
+
+function Player:onForgeHistoryBrowse(page)
+	if EventCallback.OnForgeHistoryBrowse then
+		EventCallback.OnForgeHistoryBrowse(self, page)
+	end
+end
+
+
 -- begin onConnect
 local function sendForgeTypesAsync(cid)
 	local p = Player(cid)

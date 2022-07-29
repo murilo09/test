@@ -893,8 +893,8 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		//case 0xB1: break; // request highscores
 		// 0xB2-0xBD - empty
 		case 0xBE: addGameTask([playerID = player->getID()]() { g_game.playerCancelAttackAndFollow(playerID); }); break;
-		//case 0xBF: break; // exaltation forge (scripted)
-		//case 0xC0: break; //request forge history (scripted)
+		case 0xBF: parseForgeAction(msg); break;
+		case 0xC0: parseForgeBrowseHistory(msg); break;
 		// 0xC1-0xC2 - empty
 		// 0xC3 - tournament ui 1
 		// 0xC4 - tournament ui 2
@@ -1772,6 +1772,39 @@ void ProtocolGame::parseMarketAcceptOffer(NetworkMessage& msg)
 	uint16_t counter = msg.get<uint16_t>();
 	uint16_t amount = msg.get<uint16_t>();
 	addGameTask([=, playerID = player->getID()]() { g_game.playerAcceptMarketOffer(playerID, timestamp, counter, amount); });
+}
+
+void ProtocolGame::parseForgeAction(NetworkMessage& msg)
+{
+	ForgeConversionTypes_t forgeAction = static_cast<ForgeConversionTypes_t>(msg.get<uint8_t>());
+	switch (forgeAction) {
+		case FORGE_ACTION_FUSION:
+			addGameTask([=,
+					playerID = player->getID(),
+					fromSpriteId = msg.get<uint16_t>(),
+					fromTier = msg.get<uint8_t>(),
+					toSpriteId = msg.get<uint16_t>(),
+					successCore = msg.get<uint8_t>() == 1,
+					tierLossCore = msg.get<uint8_t>() == 1
+			]() { g_game.playerFuseItems(playerID, fromSpriteId, fromTier, toSpriteId, successCore, tierLossCore); });
+			break;
+		case FORGE_ACTION_TRANSFER:
+			addGameTask([=,
+				playerID = player->getID(),
+				fromSpriteId = msg.get<uint16_t>(),
+				fromTier = msg.get<uint8_t>(),
+				toSpriteId = msg.get<uint16_t>()
+			]() { g_game.playerTransferTier(playerID, fromSpriteId, fromTier, toSpriteId); });
+			break;
+		default:
+			addGameTask([=, playerID = player->getID()]() { g_game.playerConvertForgeResources(playerID, forgeAction); });
+			break;
+	}
+}
+
+void ProtocolGame::parseForgeBrowseHistory(NetworkMessage& msg)
+{
+	addGameTask([=, playerID = player->getID(), page = msg.get<uint8_t>()]() { g_game.playerBrowseForgeHistory(playerID, page); });
 }
 
 void ProtocolGame::parseModalWindowAnswer(NetworkMessage& msg)

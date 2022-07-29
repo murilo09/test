@@ -710,6 +710,14 @@ enum InspectionTypes_t : uint8_t {
 	INSPECTION_ITEM_COMPENDIUM = 3
 };
 
+enum ForgeConversionTypes_t : uint8_t {
+	FORGE_ACTION_FUSION = 0,
+	FORGE_ACTION_TRANSFER = 1,
+	FORGE_ACTION_DUSTTOSLIVERS = 2,
+	FORGE_ACTION_SLIVERSTOCORES = 3,
+	FORGE_ACTION_INCREASELIMIT = 4
+};
+
 enum PlayerFlags : uint64_t {
 	PlayerFlag_CannotUseCombat = 1 << 0,
 	PlayerFlag_CannotAttackPlayer = 1 << 1,

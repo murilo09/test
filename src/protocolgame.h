@@ -84,12 +84,11 @@ class ProtocolGame final : public Protocol
 		bool canSee(const Creature*) const;
 		bool canSee(const Position& pos) const;
 
-		// we have all the parse methods
 		void parsePacket(NetworkMessage& msg) override;
 		void onRecvFirstMessage(NetworkMessage& msg) override;
 		void onConnect() override;
 
-		//Parse methods
+		// Parse methods
 		void parseAutoWalk(NetworkMessage& msg);
 		void parseSetOutfit(NetworkMessage& msg);
 		void parseEditPodiumRequest(NetworkMessage& msg);
@@ -142,25 +141,29 @@ class ProtocolGame final : public Protocol
 
 		void parsePlayerMinimapQuery(NetworkMessage& msg);
 
-		//trade methods
+		// Trade methods
 		void parseRequestTrade(NetworkMessage& msg);
 		void parseLookInTrade(NetworkMessage& msg);
 
-		//market methods
+		// Market methods
 		void parseMarketLeave();
 		void parseMarketBrowse(NetworkMessage& msg);
 		void parseMarketCreateOffer(NetworkMessage& msg);
 		void parseMarketCancelOffer(NetworkMessage& msg);
 		void parseMarketAcceptOffer(NetworkMessage& msg);
 
-		//VIP methods
+		// Forge methods
+		void parseForgeAction(NetworkMessage& msg);
+		void parseForgeBrowseHistory(NetworkMessage& msg);
+
+		// VIP methods
 		void parseAddVip(NetworkMessage& msg);
 		void parseRemoveVip(NetworkMessage& msg);
 		void parseEditVip(NetworkMessage& msg);
 
 		void parseRotateItem(NetworkMessage& msg);
 
-		//Channel tabs
+		// Channel tabs
 		void parseChannelInvite(NetworkMessage& msg);
 		void parseChannelExclude(NetworkMessage& msg);
 		void parseOpenChannel(NetworkMessage& msg);
@@ -168,7 +171,7 @@ class ProtocolGame final : public Protocol
 		void parseCloseChannel(NetworkMessage& msg);
 		void parseSaveGuildMotd(NetworkMessage& msg);
 
-		//Send functions
+		// Send functions
 		void sendChannelMessage(const std::string& author, const std::string& text, MessageClasses type, uint16_t channel);
 		void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent);
 		void sendClosePrivate(uint16_t channelId);

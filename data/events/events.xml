@@ -67,6 +67,12 @@
 	<event class="Player" method="onSetLootList" enabled="1" />
 	<event class="Player" method="onManageLootContainer" enabled="1" />
 	
+	<!-- Player - exaltation forge -->
+	<event class="Player" method="onFuseItems" enabled="1" />
+	<event class="Player" method="onTransferTier" enabled="1" />
+	<event class="Player" method="onForgeConversion" enabled="1" />
+	<event class="Player" method="onForgeHistoryBrowse" enabled="1" />
+
 <!-- to do (c++)
 	<!-- Player - cyclopedia - ->
 	<event class="Player" method="onRequestBestiaryAll" enabled="1" />
@@ -74,9 +80,6 @@
 	<event class="Player" method="onRequestBestiaryRace" enabled="1" />	
 	<event class="Player" method="onRequestPlayerData" enabled="1" />	
 	
-	<!-- Player - exaltation forge - ->
-	<event class="Player" method="onForgeUse" enabled="1" />	
-	<event class="Player" method="onForgeHistoryRequest" enabled="1" />		
 -->
 
 	<!-- Player - network -->

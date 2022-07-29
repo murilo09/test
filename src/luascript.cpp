@@ -2312,6 +2312,12 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(DECAYING_TRUE)
 	registerEnum(DECAYING_PENDING)
 
+	registerEnum(FORGE_ACTION_FUSION)
+	registerEnum(FORGE_ACTION_TRANSFER)
+	registerEnum(FORGE_ACTION_DUSTTOSLIVERS)
+	registerEnum(FORGE_ACTION_SLIVERSTOCORES)
+	registerEnum(FORGE_ACTION_INCREASELIMIT)
+
 	// _G
 	registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
 	registerGlobalBoolean("VIRTUAL_PARENT", true);

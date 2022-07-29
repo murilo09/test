@@ -65,6 +65,10 @@ class Events
 		int32_t playerOnGuildMotdEdit = -1;
 		int32_t playerOnSetLootList = -1;
 		int32_t playerOnManageLootContainer = -1;
+		int32_t playerOnFuseItems = -1;
+		int32_t playerOnTransferTier = -1;
+		int32_t playerOnForgeConversion = -1;
+		int32_t playerOnForgeHistoryBrowse = -1;
 
 		int32_t playerOnConnect = -1;
 		int32_t playerOnExtendedProtocol = -1;
@@ -124,6 +128,10 @@ class Events
 		const std::string eventPlayerOnGuildMotdEdit(Player* player, const std::string& message);
 		void eventPlayerOnSetLootList(Player* player, const std::vector<uint16_t>& lootList, bool isSkipMode);
 		void eventPlayerOnManageLootContainer(Player* player, Item* item, uint8_t modePrimary, uint8_t modeSecondary);
+		void eventPlayerOnFuseItems(Player* player, const ItemType* fromItemType, uint8_t fromTier, const ItemType* toItemType, bool successCore, bool tierLossCore);
+		void eventPlayerOnTransferTier(Player* player, const ItemType* fromItemType, uint8_t fromTier, const ItemType* toItemType);
+		void eventPlayerOnForgeConversion(Player* player, ForgeConversionTypes_t conversionType);
+		void eventPlayerOnForgeHistoryBrowse(Player* player, uint8_t page);
 
 		void eventPlayerOnConnect(Player* player, bool isLogin);
 		void eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message);

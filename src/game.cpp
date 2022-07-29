@@ -6108,6 +6108,89 @@ void Game::playerRegisterCurrencies(uint32_t playerId)
 	}
 }
 
+void Game::playerFuseItems(uint32_t playerId, uint16_t fromSpriteId, uint8_t fromTier, uint16_t toSpriteId, bool successCore, bool tierLossCore)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	// validate items
+	const ItemType& fromItemType = Item::items.getItemIdByClientId(fromSpriteId);
+	const ItemType& toItemType = Item::items.getItemIdByClientId(toSpriteId);
+	if (fromItemType.id == 0 || toItemType.id == 0) {
+		return;
+	}
+
+	g_events->eventPlayerOnFuseItems(player, &fromItemType, fromTier, &toItemType, successCore, tierLossCore);
+}
+
+void Game::playerTransferTier(uint32_t playerId, uint16_t fromSpriteId, uint8_t fromTier, uint16_t toSpriteId)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	// validate items
+	const ItemType& fromItemType = Item::items.getItemIdByClientId(fromSpriteId);
+	const ItemType& toItemType = Item::items.getItemIdByClientId(toSpriteId);
+	if (fromItemType.id == 0 || toItemType.id == 0) {
+		return;
+	}
+
+	g_events->eventPlayerOnTransferTier(player, &fromItemType, fromTier, &toItemType);
+}
+
+void Game::playerConvertForgeResources(uint32_t playerId, ForgeConversionTypes_t actionType)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnForgeConversion(player, actionType);
+}
+
+void Game::playerBrowseForgeHistory(uint32_t playerId, uint8_t page)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	// make sure ui clicks are organic, not botted
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnForgeHistoryBrowse(player, page);
+}
+
 void Game::parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message)
 {
 	std::unique_ptr<NetworkMessage> msgPtr(message);

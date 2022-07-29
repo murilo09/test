@@ -63,6 +63,10 @@ ec.onMinimapQuery = {}
 ec.onQuickLoot = {}
 ec.onSetLootList = {}
 ec.onManageLootContainer = {}
+ec.onFuseItems = {}
+ec.onTransferTier = {}
+ec.onForgeConversion = {}
+ec.onForgeHistoryBrowse = {}
 ec.onConnect = {}
 
 -- Monster

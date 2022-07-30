@@ -2566,6 +2566,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("NetworkMessage", "addDouble", LuaScriptInterface::luaNetworkMessageAddDouble);
 	registerMethod("NetworkMessage", "addItem", LuaScriptInterface::luaNetworkMessageAddItem);
 	registerMethod("NetworkMessage", "addItemId", LuaScriptInterface::luaNetworkMessageAddItemId);
+	registerMethod("NetworkMessage", "addItemType", LuaScriptInterface::luaNetworkMessageAddItemType);
 
 	registerMethod("NetworkMessage", "reset", LuaScriptInterface::luaNetworkMessageReset);
 	registerMethod("NetworkMessage", "seek", LuaScriptInterface::luaNetworkMessageSeek);
@@ -6565,6 +6566,22 @@ int LuaScriptInterface::luaNetworkMessageAddItemId(lua_State* L)
 
 	message->addItemId(itemId);
 	pushBoolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaNetworkMessageAddItemType(lua_State* L)
+{
+	// networkMessage:addItemType(itemType)
+	ItemType* itemType = getUserdata<ItemType>(L, 2);
+	uint16_t itemId = itemType && itemType->clientId != 0 ? itemType->id : 100;
+
+	NetworkMessage* message = getUserdata<NetworkMessage>(L, 1);
+	if (message) {
+		message->addItem(itemId, 0);
+		pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
 	return 1;
 }
 

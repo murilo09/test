@@ -9,6 +9,17 @@
 
 namespace console {
 
+#ifdef SHOW_CONSOLE_TIMESTAMPS
+std::string currentConsoleStamp() {
+	std::time_t t = std::time(nullptr);
+	std::tm* now = std::localtime(&t);
+
+	char buffer[128];
+	strftime(buffer, sizeof(buffer), "%d/%m/%Y %X", now);
+	return buffer;
+}
+#endif
+
 void print(ConsoleMessageType messageType, const std::string& message, bool newLine, const std::string& location)
 {
 	std::string prefix;
@@ -44,9 +55,25 @@ void print(ConsoleMessageType messageType, const std::string& message, bool newL
 	if (!location.empty()) {
 		prefix = fmt::format("{:s} - {:s}", prefix, location);
 		realMsgLength += 3;
+
+#ifndef SHOW_CONSOLE_PREFIXES
+		// override prefix preference for error messages
+		prefix = fmt::format("[{:s}]: ", setColor(color, prefix));
+	} else {
+		realMsgLength -= prefix.size();
+		prefix = "";
+#endif
 	}
 
+#ifdef SHOW_CONSOLE_PREFIXES
 	prefix = fmt::format("[{:s}]: ", setColor(color, prefix));
+#endif
+
+#ifdef SHOW_CONSOLE_TIMESTAMPS
+	std::string timePrefix = currentConsoleStamp();
+	prefix = fmt::format("[{:s}] {:s}", timePrefix, prefix);
+	realMsgLength += (timePrefix.size() + 3);
+#endif
 
 	if (messageType == CONSOLEMESSAGE_TYPE_STARTUP_SPECIAL) {
 		color = serveronline;

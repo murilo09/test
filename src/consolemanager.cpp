@@ -9,6 +9,8 @@
 
 namespace console {
 
+std::string lastMessage;
+
 #ifdef SHOW_CONSOLE_TIMESTAMPS
 std::string currentConsoleStamp() {
 	std::time_t t = std::time(nullptr);
@@ -23,6 +25,8 @@ std::string currentConsoleStamp() {
 void print(ConsoleMessageType messageType, const std::string& message, bool newLine, const std::string& location)
 {
 	std::string prefix;
+	std::ostringstream msgToCache;
+
 	Color color;
 
 	switch (messageType) {
@@ -49,6 +53,8 @@ void print(ConsoleMessageType messageType, const std::string& message, bool newL
 			color = info;
 			break;
 	}
+
+	msgToCache << "[" << (!location.empty() ? fmt::format("{:s} - {:s}", prefix, location) : prefix) << "]: " << message;
 
 	size_t realMsgLength = prefix.size() + message.size() + location.size();
 
@@ -101,6 +107,7 @@ void print(ConsoleMessageType messageType, const std::string& message, bool newL
 		outStr << std::flush;
 	}
 
+	lastMessage = msgToCache.str();
 	std::cout << outStr.str() << std::flush;
 }
 
@@ -222,5 +229,10 @@ std::string setColor(Color color, const std::string& text)
 #else
 std::string setColor(Color, const std::string& text) { return text; }
 #endif
+
+const std::string& getLastMessage()
+{
+	return lastMessage;
+}
 
 } // namespace console

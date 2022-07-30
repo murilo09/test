@@ -101,5 +101,8 @@ std::string getColumns(const std::string& leftColumn, const std::string& rightCo
 // args: text, color
 std::string setColor(Color color, const std::string& text);
 
+// returns last message sent
+const std::string& getLastMessage();
+
 } // namespace console
 #endif

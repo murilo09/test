@@ -2478,6 +2478,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Game", "saveAccountStorageValues", LuaScriptInterface::luaGameSaveAccountStorageValues);
 
 	registerMethod("Game", "sendConsoleMessage", LuaScriptInterface::luaGameSendConsoleMessage);
+	registerMethod("Game", "getLastConsoleMessage", LuaScriptInterface::luaGameGetLastConsoleMessage);
 
 	// Variant
 	registerClass("Variant", "", LuaScriptInterface::luaVariantCreate);
@@ -5240,11 +5241,11 @@ int LuaScriptInterface::luaGameCreateMonster(lua_State* L)
 			setMetatable(L, -1, "Monster");
 		} else {
 			delete monster;
-			lua_pushnil(L);
+			lua_pushboolean(L, false);
 		}
 	} else {
 		delete monster;
-		lua_pushnil(L);
+		lua_pushboolean(L, false);
 	}
 	return 1;
 }
@@ -5268,7 +5269,7 @@ int LuaScriptInterface::luaGameCreateNpc(lua_State* L)
 		setMetatable(L, -1, "Npc");
 	} else {
 		delete npc;
-		lua_pushnil(L);
+		lua_pushboolean(L, false);
 	}
 	return 1;
 }
@@ -5433,6 +5434,13 @@ int LuaScriptInterface::luaGameSendConsoleMessage(lua_State* L)
 		lua_pushboolean(L, false);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaGameGetLastConsoleMessage(lua_State* L)
+{
+	// Game.getLastConsoleMessage()
+	lua_pushstring(L, console::getLastMessage().c_str());
 	return 1;
 }
 

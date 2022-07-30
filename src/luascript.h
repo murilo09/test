@@ -583,6 +583,7 @@ class LuaScriptInterface
 		static int luaGameSaveAccountStorageValues(lua_State* L);
 
 		static int luaGameSendConsoleMessage(lua_State* L);
+		static int luaGameGetLastConsoleMessage(lua_State* L);
 
 		// Variant
 		static int luaVariantCreate(lua_State* L);

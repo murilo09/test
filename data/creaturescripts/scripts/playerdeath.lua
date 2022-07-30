@@ -52,7 +52,9 @@ function onDeath(player, corpse, killer, mostDamageKiller, lastHitUnjustified, m
 		killer:takeScreenshot(SCREENSHOT_TYPE_PLAYERKILL)
 	end
 	if mostDamageKiller and mostDamageKiller:isPlayer() then
-		mostDamageKiller:takeScreenshot(SCREENSHOT_TYPE_PLAYERKILL)
+		if not killer or killer ~= mostDamageKiller then
+			mostDamageKiller:takeScreenshot(SCREENSHOT_TYPE_PLAYERKILL)
+		end
 	end
 
 	if not deathListEnabled then

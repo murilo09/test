@@ -2711,9 +2711,9 @@ void Game::playerInspectClientItem(uint32_t playerId, uint16_t spriteId, bool is
 		return;
 	}
 
-	// compendium inspect
+	// cyclopedia inspect
 	if (!isNpcTrade) {
-		g_events->eventPlayerOnInspectCompendiumItem(player, it.id);
+		g_events->eventPlayerOnInspectCyclopediaItem(player, it.id);
 		return;
 	}
 
@@ -6181,7 +6181,6 @@ void Game::playerBrowseForgeHistory(uint32_t playerId, uint8_t page)
 	}
 
 	// prevent request spam
-	// make sure ui clicks are organic, not botted
 	if (player->canDoLightUIAction()) {
 		player->setNextLightUIAction();
 	} else {
@@ -6189,6 +6188,32 @@ void Game::playerBrowseForgeHistory(uint32_t playerId, uint8_t page)
 	}
 
 	g_events->eventPlayerOnForgeHistoryBrowse(player, page);
+}
+
+void Game::playerViewPlayerTab(uint32_t playerId, uint32_t targetPlayerId, PlayerTabTypes_t infoType, uint16_t currentPage, uint16_t entriesPerPage)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	Player* targetPlayer = getPlayerByID(targetPlayerId);
+	if (!targetPlayer) {
+		targetPlayer = player;
+	}
+
+	if (!targetPlayer || targetPlayer->isRemoved()) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoLightUIAction()) {
+		player->setNextLightUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnRequestPlayerTab(player, targetPlayer, infoType, currentPage, entriesPerPage);
 }
 
 void Game::parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message)

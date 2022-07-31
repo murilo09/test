@@ -59,7 +59,7 @@ class Events
 		int32_t playerOnInspectItem = -1;
 		int32_t playerOnInspectTradeItem = -1;
 		int32_t playerOnInspectNpcTradeItem = -1;
-		int32_t playerOnInspectCompendiumItem = -1;
+		int32_t playerOnInspectCyclopediaItem = -1;
 		int32_t playerOnMinimapQuery = -1;
 		int32_t playerOnInventoryUpdate = -1;
 		int32_t playerOnGuildMotdEdit = -1;
@@ -69,6 +69,7 @@ class Events
 		int32_t playerOnTransferTier = -1;
 		int32_t playerOnForgeConversion = -1;
 		int32_t playerOnForgeHistoryBrowse = -1;
+		int32_t playerOnRequestPlayerTab = -1;
 
 		int32_t playerOnConnect = -1;
 		int32_t playerOnExtendedProtocol = -1;
@@ -122,7 +123,7 @@ class Events
 		void eventPlayerOnInspectItem(Player* player, Item* item);
 		void eventPlayerOnInspectTradeItem(Player* player, Player* tradePartner, Item* item);
 		void eventPlayerOnInspectNpcTradeItem(Player* player, Npc* npc, uint16_t itemId);
-		void eventPlayerOnInspectCompendiumItem(Player* player, uint16_t itemId);
+		void eventPlayerOnInspectCyclopediaItem(Player* player, uint16_t itemId);
 		void eventPlayerOnMinimapQuery(Player* player, const Position& position);
 		void eventPlayerOnInventoryUpdate(Player* player, Item* item, slots_t slot, bool equip);
 		const std::string eventPlayerOnGuildMotdEdit(Player* player, const std::string& message);
@@ -132,6 +133,7 @@ class Events
 		void eventPlayerOnTransferTier(Player* player, const ItemType* fromItemType, uint8_t fromTier, const ItemType* toItemType);
 		void eventPlayerOnForgeConversion(Player* player, ForgeConversionTypes_t conversionType);
 		void eventPlayerOnForgeHistoryBrowse(Player* player, uint8_t page);
+		void eventPlayerOnRequestPlayerTab(Player* player, Player* targetPlayer, PlayerTabTypes_t infoType, uint16_t currentPage, uint16_t entriesPerPage);
 
 		void eventPlayerOnConnect(Player* player, bool isLogin);
 		void eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message);

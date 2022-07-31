@@ -52,7 +52,7 @@
 	<event class="Player" method="onInspectItem" enabled="1" />
 	<event class="Player" method="onInspectTradeItem" enabled="1" />
 	<event class="Player" method="onInspectNpcTradeItem" enabled="1" />
-	<event class="Player" method="onInspectCompendiumItem" enabled="1" />
+	<event class="Player" method="onInspectCyclopediaItem" enabled="1" />
 
 	<!-- Player - report -->
 	<event class="Player" method="onReportBug" enabled="1" />
@@ -73,13 +73,13 @@
 	<event class="Player" method="onForgeConversion" enabled="1" />
 	<event class="Player" method="onForgeHistoryBrowse" enabled="1" />
 
+	<!-- Player - cyclopedia -->
+	<event class="Player" method="onRequestPlayerTab" enabled="1" />
+	
 <!-- to do (c++)
-	<!-- Player - cyclopedia - ->
 	<event class="Player" method="onRequestBestiaryAll" enabled="1" />
 	<event class="Player" method="onRequestBestiaryClass" enabled="1" />	
 	<event class="Player" method="onRequestBestiaryRace" enabled="1" />	
-	<event class="Player" method="onRequestPlayerData" enabled="1" />	
-	
 -->
 
 	<!-- Player - network -->

@@ -334,9 +334,9 @@ function Player:onInspectNpcTradeItem(npc, itemId)
 	end
 end
 
-function Player:onInspectCompendiumItem(itemId)
-	if EventCallback.onInspectCompendiumItem then
-		EventCallback.onInspectCompendiumItem(self, itemId)
+function Player:onInspectCyclopediaItem(itemId)
+	if EventCallback.onInspectCyclopediaItem then
+		EventCallback.onInspectCyclopediaItem(self, itemId)
 	end
 end
 -- end inspection feature
@@ -400,6 +400,11 @@ function Player:onForgeHistoryBrowse(page)
 	end
 end
 
+function Player:onRequestPlayerTab(target, infoType, currentPage, entriesPerPage)
+	if EventCallback.onRequestPlayerTab then
+		EventCallback.onRequestPlayerTab(self, target, infoType, currentPage, entriesPerPage)
+	end
+end
 
 -- begin onConnect
 local function sendForgeTypesAsync(cid)

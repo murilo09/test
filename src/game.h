@@ -425,6 +425,7 @@ class Game
 		void playerTransferTier(uint32_t playerId, uint16_t fromSpriteId, uint8_t fromTier, uint16_t toSpriteId);
 		void playerConvertForgeResources(uint32_t playerId, ForgeConversionTypes_t actionType);
 		void playerBrowseForgeHistory(uint32_t playerId, uint8_t page);
+		void playerViewPlayerTab(uint32_t playerId, uint32_t targetPlayerId, PlayerTabTypes_t infoType, uint16_t currentPage, uint16_t entriesPerPage);
 
 		void parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message);
 		void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);

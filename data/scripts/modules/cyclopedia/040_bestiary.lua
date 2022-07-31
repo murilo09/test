@@ -1061,7 +1061,7 @@ end
 
 function Player:sendCharms()
 	local response = NetworkMessage()
-	response:addByte(COMPENDIUM_RESPONSE_CHARMS)
+	response:addByte(CYCLOPEDIA_RESPONSE_CHARMS)
 	response:addU32(0) -- charm points
 
 	local charmCount = 19
@@ -1096,7 +1096,7 @@ function Player:sendBestiary()
 	self:sendResourceBalance(RESOURCE_CHARM_POINTS, self:getCharmPoints())
 	
 	local response = NetworkMessage()
-	response:addByte(COMPENDIUM_RESPONSE_BESTIARY)
+	response:addByte(CYCLOPEDIA_RESPONSE_BESTIARY)
 	response:addU16(BESTIARY_TYPE_LAST)
 	for bestiaryType = BESTIARY_TYPE_FIRST, BESTIARY_TYPE_LAST do
 		response:addString(GameBestiaryTypes[bestiaryType].name)
@@ -1115,7 +1115,7 @@ end
 
 do
 	local callback = onRequestBestiaryCharms
-	setPacketEvent(COMPENDIUM_REQUEST_BESTIARY, callback)
+	setPacketEvent(CYCLOPEDIA_REQUEST_BESTIARY, callback)
 end
 
 -- click on monster category
@@ -1125,12 +1125,12 @@ do
 		local requestedCategory = BestiaryTypeByName[networkMessage:getString()]
 		local bestiaryTab = GameBestiaryTypes[requestedCategory]
 		if not bestiaryTab then
-			sendCompendiumError(player, COMPENDIUM_PLAYER_BASEINFORMATION, COMPENDIUM_RESPONSETYPE_NODATA)
+			sendCyclopediaError(player, PLAYERTAB_BASEINFORMATION, CYCLOPEDIA_RESPONSETYPE_NODATA)
 			return true
 		end
 		
 		local m = NetworkMessage()
-		m:addByte(COMPENDIUM_RESPONSE_BESTIARY_SPECIES)
+		m:addByte(CYCLOPEDIA_RESPONSE_BESTIARY_SPECIES)
 		m:addString(bestiaryTab.name)
 
 		-- monsters block
@@ -1155,7 +1155,7 @@ do
 		m:sendToPlayer(player)
 		return true
 	end
-	setPacketEvent(COMPENDIUM_REQUEST_BESTIARY_SPECIES, callback)
+	setPacketEvent(CYCLOPEDIA_REQUEST_BESTIARY_SPECIES, callback)
 end
 
 -- view bestiary creature
@@ -1163,7 +1163,7 @@ do
 	-- error page for incorrect creature
 	local function sendGenericPage(player)
 		local m = NetworkMessage()
-		m:addByte(COMPENDIUM_RESPONSE_BESTIARY_RACE)
+		m:addByte(CYCLOPEDIA_RESPONSE_BESTIARY_RACE)
 		m:addU16(0) -- raceId
 		m:addString("Amphibic") -- category name (for return to category button)
 		m:addByte(3) -- progress level
@@ -1208,7 +1208,7 @@ do
 		end
 		
 		local m = NetworkMessage()
-		m:addByte(COMPENDIUM_RESPONSE_BESTIARY_RACE)
+		m:addByte(CYCLOPEDIA_RESPONSE_BESTIARY_RACE)
 		m:addU16(raceId) -- raceId
 		m:addString(BestiaryNameByType[race.class] or "Amphibic") -- category name (for return to category button)
 		
@@ -1343,5 +1343,5 @@ do
 		m:sendToPlayer(player)
 		return true
 	end
-	setPacketEvent(COMPENDIUM_REQUEST_BESTIARY_RACE, callback)
+	setPacketEvent(CYCLOPEDIA_REQUEST_BESTIARY_RACE, callback)
 end

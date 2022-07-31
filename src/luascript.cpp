@@ -2318,6 +2318,24 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(FORGE_ACTION_SLIVERSTOCORES)
 	registerEnum(FORGE_ACTION_INCREASELIMIT)
 
+	registerEnum(INSPECTION_ITEM_NORMAL)
+	registerEnum(INSPECTION_ITEM_NPCTRADE)
+	registerEnum(INSPECTION_ITEM_PLAYERTRADE)
+	registerEnum(INSPECTION_ITEM_CYCLOPEDIA)
+
+	registerEnum(PLAYERTAB_BASEINFORMATION)
+	registerEnum(PLAYERTAB_GENERAL)
+	registerEnum(PLAYERTAB_COMBAT)
+	registerEnum(PLAYERTAB_DEATHS)
+	registerEnum(PLAYERTAB_PVPKILLS)
+	registerEnum(PLAYERTAB_ACHIEVEMENTS)
+	registerEnum(PLAYERTAB_INVENTORY)
+	registerEnum(PLAYERTAB_COSMETICS)
+	registerEnum(PLAYERTAB_STORE)
+	registerEnum(PLAYERTAB_INSPECTION)
+	registerEnum(PLAYERTAB_BADGES)
+	registerEnum(PLAYERTAB_TITLES)
+
 	// _G
 	registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
 	registerGlobalBoolean("VIRTUAL_PARENT", true);

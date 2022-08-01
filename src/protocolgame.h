@@ -90,6 +90,10 @@ class ProtocolGame final : public Protocol
 
 		// Parse methods
 
+		// Bestiary
+		void parseBestiaryCategory(NetworkMessage& msg);
+		void parseBestiaryCreature(NetworkMessage& msg);
+
 		// Channel tabs
 		void parseChannelInvite(NetworkMessage& msg);
 		void parseChannelExclude(NetworkMessage& msg);

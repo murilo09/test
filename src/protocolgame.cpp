@@ -926,9 +926,9 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xDE: parseEditVip(msg); break;
 		//case 0xDF: break; // vip group
 		//case 0xE0: break; // game news(?)
-		//case 0xE1: break; // bestiary 1 (scripted)
-		//case 0xE2: break; // bestiary 2 (scripted)
-		//case 0xE3: break; // bestiary 3 (scripted)
+		case 0xE1: addGameTask([playerID = player->getID()]() { g_game.playerInitBestiary(playerID); }); break;
+		case 0xE2: parseBestiaryCategory(msg); break;
+		case 0xE3: parseBestiaryCreature(msg); break;
 		//case 0xE4: break; // buy charm
 		case 0xE5: parseCyclopediaViewPlayerInfo(msg); break; // player stats
 		case 0xE6: parseBugReport(msg); break;
@@ -1152,6 +1152,33 @@ bool ProtocolGame::canSee(int32_t x, int32_t y, int32_t z) const
 }
 
 // Parse methods
+
+void ProtocolGame::parseBestiaryCategory(NetworkMessage& msg)
+{
+	// 0 - request category (string)
+	// 1 - request list (u16 size, u16 race ids)
+	uint8_t mode = msg.getByte();
+	std::string category;
+	std::vector<uint16_t> raceList;
+
+	if (mode == 0) {
+		category = msg.getString();
+	} else {
+		// mode == 1
+		uint16_t listSize = msg.get<uint16_t>();
+		for (int i = 0; i < listSize; ++i) {
+			raceList.push_back(msg.get<uint16_t>());
+		}
+	}
+
+	addGameTask([playerID = player->getID(), category = std::move(category), races = raceList]() { g_game.playerBrowseBestiary(playerID, category, races); });
+}
+
+void ProtocolGame::parseBestiaryCreature(NetworkMessage& msg)
+{
+	addGameTask([playerID = player->getID(), raceId = msg.get<uint16_t>()]() { g_game.playerRequestRaceInfo(playerID, raceId); });
+}
+
 void ProtocolGame::parseChannelInvite(NetworkMessage& msg)
 {
 	std::string name = msg.getString();

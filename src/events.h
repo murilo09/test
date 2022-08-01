@@ -70,6 +70,9 @@ class Events
 		int32_t playerOnForgeConversion = -1;
 		int32_t playerOnForgeHistoryBrowse = -1;
 		int32_t playerOnRequestPlayerTab = -1;
+		int32_t playerOnBestiaryInit = -1;
+		int32_t playerOnBestiaryBrowse = -1;
+		int32_t playerOnBestiaryRaceView = -1;
 
 		int32_t playerOnConnect = -1;
 		int32_t playerOnExtendedProtocol = -1;
@@ -134,6 +137,9 @@ class Events
 		void eventPlayerOnForgeConversion(Player* player, ForgeConversionTypes_t conversionType);
 		void eventPlayerOnForgeHistoryBrowse(Player* player, uint8_t page);
 		void eventPlayerOnRequestPlayerTab(Player* player, Player* targetPlayer, PlayerTabTypes_t infoType, uint16_t currentPage, uint16_t entriesPerPage);
+		void eventPlayerOnBestiaryInit(Player* player);
+		void eventPlayerOnBestiaryBrowse(Player* player, const std::string& category, std::vector<uint16_t> raceList);
+		void eventPlayerOnBestiaryRaceView(Player* player, uint16_t raceId);
 
 		void eventPlayerOnConnect(Player* player, bool isLogin);
 		void eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message);

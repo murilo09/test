@@ -426,6 +426,9 @@ class Game
 		void playerConvertForgeResources(uint32_t playerId, ForgeConversionTypes_t actionType);
 		void playerBrowseForgeHistory(uint32_t playerId, uint8_t page);
 		void playerViewPlayerTab(uint32_t playerId, uint32_t targetPlayerId, PlayerTabTypes_t infoType, uint16_t currentPage, uint16_t entriesPerPage);
+		void playerInitBestiary(uint32_t playerId);
+		void playerBrowseBestiary(uint32_t playerId, const std::string& category, std::vector<uint16_t> raceList);
+		void playerRequestRaceInfo(uint32_t playerId, uint16_t raceId);
 
 		void parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message);
 		void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);

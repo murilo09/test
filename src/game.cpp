@@ -6216,6 +6216,57 @@ void Game::playerViewPlayerTab(uint32_t playerId, uint32_t targetPlayerId, Playe
 	g_events->eventPlayerOnRequestPlayerTab(player, targetPlayer, infoType, currentPage, entriesPerPage);
 }
 
+void Game::playerInitBestiary(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnBestiaryInit(player);
+}
+
+void Game::playerBrowseBestiary(uint32_t playerId, const std::string& category, std::vector<uint16_t> raceList)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnBestiaryBrowse(player, category, raceList);
+}
+
+void Game::playerRequestRaceInfo(uint32_t playerId, uint16_t raceId)
+{
+	Player* player = getPlayerByID(playerId);
+	if (!player) {
+		return;
+	}
+
+	// prevent request spam
+	if (player->canDoHeavyUIAction()) {
+		player->setNextHeavyUIAction();
+	} else {
+		return;
+	}
+
+	g_events->eventPlayerOnBestiaryRaceView(player, raceId);
+}
+
 void Game::parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message)
 {
 	std::unique_ptr<NetworkMessage> msgPtr(message);

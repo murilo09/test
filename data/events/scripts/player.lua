@@ -406,6 +406,24 @@ function Player:onRequestPlayerTab(target, infoType, currentPage, entriesPerPage
 	end
 end
 
+function Player:onBestiaryInit()
+	if EventCallback.onBestiaryInit then
+		EventCallback.onBestiaryInit(self)
+	end
+end
+
+function Player:onBestiaryBrowse(category, raceList)
+	if EventCallback.onBestiaryBrowse then
+		EventCallback.onBestiaryBrowse(self, category, raceList)
+	end
+end
+
+function Player:onBestiaryRaceView(raceId)
+	if EventCallback.onBestiaryRaceView then
+		EventCallback.onBestiaryRaceView(self, raceId)
+	end
+end
+
 -- begin onConnect
 local function sendForgeTypesAsync(cid)
 	local p = Player(cid)

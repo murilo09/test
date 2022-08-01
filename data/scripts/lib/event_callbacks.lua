@@ -68,6 +68,9 @@ ec.onTransferTier = {}
 ec.onForgeConversion = {}
 ec.onForgeHistoryBrowse = {}
 ec.onRequestPlayerTab = {}
+ec.onBestiaryInit = {}
+ec.onBestiaryBrowse = {}
+ec.onBestiaryRaceView = {}
 ec.onConnect = {}
 
 -- Monster

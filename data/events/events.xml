@@ -75,12 +75,9 @@
 
 	<!-- Player - cyclopedia -->
 	<event class="Player" method="onRequestPlayerTab" enabled="1" />
-	
-<!-- to do (c++)
-	<event class="Player" method="onRequestBestiaryAll" enabled="1" />
-	<event class="Player" method="onRequestBestiaryClass" enabled="1" />	
-	<event class="Player" method="onRequestBestiaryRace" enabled="1" />	
--->
+	<event class="Player" method="onBestiaryInit" enabled="1" />
+	<event class="Player" method="onBestiaryBrowse" enabled="1" />
+	<event class="Player" method="onBestiaryRaceView" enabled="1" />
 
 	<!-- Player - network -->
 	<event class="Player" method="onConnect" enabled="1" />

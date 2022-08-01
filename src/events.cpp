@@ -145,6 +145,12 @@ bool Events::load()
 				info.playerOnForgeHistoryBrowse = event;
 			} else if (methodName == "onRequestPlayerTab") {
 				info.playerOnRequestPlayerTab = event;
+			} else if (methodName == "onBestiaryInit") {
+				info.playerOnBestiaryInit = event;
+			} else if (methodName == "onBestiaryBrowse") {
+				info.playerOnBestiaryBrowse = event;
+			} else if (methodName == "onBestiaryRaceView") {
+				info.playerOnBestiaryRaceView = event;
 
 			// network methods
 			} else if (methodName == "onConnect") {
@@ -1657,6 +1663,95 @@ void Events::eventPlayerOnRequestPlayerTab(Player* player, Player* targetPlayer,
 	lua_pushnumber(L, entriesPerPage);
 
 	scriptInterface.callVoidFunction(5);
+}
+
+void Events::eventPlayerOnBestiaryInit(Player* player)
+{
+	// Player:onBestiaryInit()
+	if (info.playerOnBestiaryInit == -1) {
+		return;
+	}
+
+	if (!scriptInterface.reserveScriptEnv()) {
+		console::reportOverflow("Events::eventPlayerOnBestiaryInit");
+		return;
+	}
+
+	ScriptEnvironment* env = scriptInterface.getScriptEnv();
+	env->setScriptId(info.playerOnBestiaryInit, &scriptInterface);
+
+	lua_State* L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(info.playerOnBestiaryInit);
+
+	// player
+	LuaScriptInterface::pushUserdata<Player>(L, player);
+	LuaScriptInterface::setMetatable(L, -1, "Player");
+
+	scriptInterface.callVoidFunction(1);
+}
+
+void Events::eventPlayerOnBestiaryBrowse(Player* player, const std::string& category, std::vector<uint16_t> raceList)
+{
+	// Player:onBestiaryBrowse(category, raceList)
+	if (info.playerOnBestiaryBrowse == -1) {
+		return;
+	}
+
+	if (!scriptInterface.reserveScriptEnv()) {
+		console::reportOverflow("Events::eventPlayerOnBestiaryBrowse");
+		return;
+	}
+
+	ScriptEnvironment* env = scriptInterface.getScriptEnv();
+	env->setScriptId(info.playerOnBestiaryBrowse, &scriptInterface);
+
+	lua_State* L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(info.playerOnBestiaryBrowse);
+
+	// player
+	LuaScriptInterface::pushUserdata<Player>(L, player);
+	LuaScriptInterface::setMetatable(L, -1, "Player");
+
+	// category
+	lua_pushstring(L, category.c_str());
+
+	// raceList
+	lua_createtable(L, raceList.size(), 0);
+	int index = 0;
+	for (auto raceId : raceList) {
+		lua_pushnumber(L, raceId);
+		lua_rawseti(L, -2, ++index);
+	}
+
+	scriptInterface.callVoidFunction(3);
+}
+
+void Events::eventPlayerOnBestiaryRaceView(Player* player, uint16_t raceId)
+{
+	// Player:onBestiaryRaceView(category, raceId)
+	if (info.playerOnBestiaryRaceView == -1) {
+		return;
+	}
+
+	if (!scriptInterface.reserveScriptEnv()) {
+		console::reportOverflow("Events::eventPlayerOnBestiaryRaceView");
+		return;
+	}
+
+	ScriptEnvironment* env = scriptInterface.getScriptEnv();
+	env->setScriptId(info.playerOnBestiaryRaceView, &scriptInterface);
+
+	lua_State* L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(info.playerOnBestiaryRaceView);
+
+	// player
+	LuaScriptInterface::pushUserdata<Player>(L, player);
+	LuaScriptInterface::setMetatable(L, -1, "Player");
+
+	// raceId
+	lua_pushnumber(L, raceId);
+
+	scriptInterface.callVoidFunction(2);
 }
 
 void Events::eventPlayerOnConnect(Player* player, bool isLogin)

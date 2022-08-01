@@ -1779,6 +1779,7 @@ void Events::eventPlayerOnConnect(Player* player, bool isLogin)
 	scriptInterface.callVoidFunction(2);
 }
 
+#ifdef LUA_EXTENDED_PROTOCOL
 void Events::eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message)
 {
 	// Player:onExtendedProtocol(recvbyte, msg)
@@ -1807,6 +1808,7 @@ void Events::eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std
 
 	scriptInterface.callVoidFunction(3);
 }
+#endif
 
 void Events::eventMonsterOnDropLoot(Monster* monster, Container* corpse)
 {

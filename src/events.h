@@ -142,7 +142,10 @@ class Events
 		void eventPlayerOnBestiaryRaceView(Player* player, uint16_t raceId);
 
 		void eventPlayerOnConnect(Player* player, bool isLogin);
+
+#ifdef LUA_EXTENDED_PROTOCOL
 		void eventPlayerOnExtendedProtocol(Player* player, uint8_t recvbyte, std::unique_ptr<NetworkMessage> message);
+#endif
 
 		// Monster
 		void eventMonsterOnDropLoot(Monster* monster, Container* corpse);

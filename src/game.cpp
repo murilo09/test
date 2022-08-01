@@ -6267,6 +6267,7 @@ void Game::playerRequestRaceInfo(uint32_t playerId, uint16_t raceId)
 	g_events->eventPlayerOnBestiaryRaceView(player, raceId);
 }
 
+#ifdef LUA_EXTENDED_PROTOCOL
 void Game::parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message)
 {
 	std::unique_ptr<NetworkMessage> msgPtr(message);
@@ -6277,6 +6278,7 @@ void Game::parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMes
 
 	g_events->eventPlayerOnExtendedProtocol(player, recvbyte, std::move(msgPtr));
 }
+#endif
 
 void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer)
 {

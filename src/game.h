@@ -430,7 +430,9 @@ class Game
 		void playerBrowseBestiary(uint32_t playerId, const std::string& category, std::vector<uint16_t> raceList);
 		void playerRequestRaceInfo(uint32_t playerId, uint16_t raceId);
 
+#ifdef LUA_EXTENDED_PROTOCOL
 		void parseExtendedProtocol(uint32_t playerId, uint8_t recvbyte, NetworkMessage* message);
+#endif
 		void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);
 
 

@@ -1381,7 +1381,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 		}
 	}
 
-	if (item->getDuration() > 0) {
+	if (item->getDuration() > 0 && !item->getDecaying()) {
 		item->incrementReferenceCounter();
 		item->setDecaying(DECAYING_TRUE);
 		toDecayItems.push_front(item);

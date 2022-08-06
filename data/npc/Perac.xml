@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<npc name="Perac" speechbubble="2" script="default.lua">
+ 	<look type="128" head="66" body="46" legs="2" feet="89"/>
+	<parameters>
+		<parameter key="module_shop" value="1" />
+		<parameter key="shop_buyable" value="crossbow,2455,200;bow,2456,100;arrow,2544,2;bolt,2543,3;spear,2389,10" />
+	</parameters>
+</npc>

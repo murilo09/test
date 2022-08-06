@@ -120,6 +120,7 @@ class Player final : public Creature, public Cylinder
 		const std::string& getNameDescription() const override {
 			return name;
 		}
+
 		std::string getDescription(int32_t lookDistance) const override;
 
 		CreatureType_t getType() const override {

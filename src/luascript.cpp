@@ -2748,6 +2748,11 @@ void LuaScriptInterface::registerFunctions()
 
 	registerMethod("Creature", "getId", LuaScriptInterface::luaCreatureGetId);
 	registerMethod("Creature", "getName", LuaScriptInterface::luaCreatureGetName);
+	registerMethod("Creature", "getDisplayName", LuaScriptInterface::luaCreatureGetDisplayName);
+	registerMethod("Creature", "setDisplayName", LuaScriptInterface::luaCreatureSetDisplayName);
+
+	registerMethod("Creature", "isPhantom", LuaScriptInterface::luaCreatureIsPhantom);
+	registerMethod("Creature", "setPhantom", LuaScriptInterface::luaCreatureSetPhantom);
 
 	registerMethod("Creature", "getTarget", LuaScriptInterface::luaCreatureGetTarget);
 	registerMethod("Creature", "setTarget", LuaScriptInterface::luaCreatureSetTarget);
@@ -2797,11 +2802,13 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Creature", "say", LuaScriptInterface::luaCreatureSay);
 
 	registerMethod("Creature", "getDamageMap", LuaScriptInterface::luaCreatureGetDamageMap);
+	registerMethod("Creature", "resetDamageMap", LuaScriptInterface::luaCreatureResetDamageMap);
+
 	registerMethod("Creature", "getAssistMap", LuaScriptInterface::luaCreatureGetAssistMap);
+	registerMethod("Creature", "resetAssistMap", LuaScriptInterface::luaCreatureResetAssistMap);
 
 	registerMethod("Creature", "addAssist", LuaScriptInterface::luaCreatureAddAssist);
 	registerMethod("Creature", "removeAssist", LuaScriptInterface::luaCreatureRemoveAssist);
-	registerMethod("Creature", "resetAssistMap", LuaScriptInterface::luaCreatureResetAssistMap);
 
 	registerMethod("Creature", "getSummons", LuaScriptInterface::luaCreatureGetSummons);
 
@@ -8418,6 +8425,65 @@ int LuaScriptInterface::luaCreatureGetName(lua_State* L)
 	return 1;
 }
 
+
+int LuaScriptInterface::luaCreatureGetDisplayName(lua_State* L)
+{
+	// creature:getDisplayName()
+	const Creature* creature = getUserdata<const Creature>(L, 1);
+	if (creature) {
+		pushString(L, creature->getDisplayName());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaCreatureSetDisplayName(lua_State* L)
+{
+	// creature:setDisplayName()
+	Creature* creature = getUserdata<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->setDisplayName(getString(L, 2));
+	creature->refreshInClient();
+	pushBoolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaCreatureIsPhantom(lua_State* L)
+{
+	// creature:isPhantom()
+	const Creature* creature = getUserdata<const Creature>(L, 1);
+	if (creature) {
+		pushBoolean(L, creature->isPhantom());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaCreatureSetPhantom(lua_State* L)
+{
+	// alters walkthrough permissions:
+	// true - can always be walked through
+	// false - use default walkthrough logic
+
+	// creature:setPhantom(state)
+	Creature* creature = getUserdata<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->setPhantom(getBoolean(L, 2));
+	creature->refreshInClient();
+	pushBoolean(L, true);
+	return 1;
+}
+
 int LuaScriptInterface::luaCreatureGetTarget(lua_State* L)
 {
 	// creature:getTarget()
@@ -9111,6 +9177,20 @@ int LuaScriptInterface::luaCreatureRemoveAssist(lua_State* L)
 
 	uint32_t creatureId = getNumber<uint32_t>(L, 2);
 	creature->removeAssist(creatureId);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaCreatureResetDamageMap(lua_State* L)
+{
+	// creature:resetDamageMap()
+	Creature* creature = getUserdata<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->resetDamageMap();
 	lua_pushboolean(L, true);
 	return 1;
 }

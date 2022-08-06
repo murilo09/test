@@ -10,6 +10,7 @@
 #include "condition.h"
 #include "configmanager.h"
 #include "depotchest.h"
+#include "events.h"
 #include "game.h"
 #include "inbox.h"
 #include "iologindata.h"
@@ -27,6 +28,7 @@ extern ConfigManager g_config;
 extern Actions actions;
 extern CreatureEvents* g_creatureEvents;
 extern Chat* g_chat;
+extern Events* g_events;
 
 namespace {
 
@@ -2341,7 +2343,7 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 
 			const ItemType& itemType = Item::items[shopInfo.itemId];
 			if (itemType.hasSubType() && !itemType.stackable && itemType.charges == 0) {
-				subtype = (shopInfo.subType == 0 ? -1 : shopInfo.subType);
+				subtype = (!itemType.isFluidContainer() && shopInfo.subType == 0 ? -1 : shopInfo.subType);
 			}
 
 			uint32_t count = player->getItemTypeCount(shopInfo.itemId, subtype, true, 0);
@@ -2368,7 +2370,7 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 
 			const ItemType& itemType = Item::items[shopInfo.itemId];
 			if (itemType.hasSubType() && !itemType.stackable && itemType.charges == 0) {
-				subtype = (shopInfo.subType == 0 ? -1 : shopInfo.subType);
+				subtype = (!itemType.isFluidContainer() && shopInfo.subType == 0 ? -1 : shopInfo.subType);
 			}
 
 			if (subtype != -1) {
@@ -2507,8 +2509,12 @@ void ProtocolGame::sendMarketEnter()
 	msg.add<uint16_t>(itemsToSend);
 	for (auto it = depotItems.begin(); i < itemsToSend; ++it, ++i) {
 		const ItemType& itemType = Item::items[it->first.first];
-		msg.add<uint16_t>(itemType.wareId);
-		if (itemType.classification > 0) {
+		const ItemType& wareItemType = Item::items.getItemIdByClientId(itemType.wareId);
+		bool displayWareItem = wareItemType.clientId != 0;
+		uint8_t classification = displayWareItem ? wareItemType.classification : itemType.classification;
+
+		msg.add<uint16_t>(displayWareItem ? itemType.wareId : itemType.clientId);
+		if (classification > 0) {
 			msg.addByte(it->first.second);
 		}
 		msg.add<uint16_t>(std::min<uint32_t>(0xFFFF, it->second));
@@ -3887,7 +3893,8 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 			msg.add<uint32_t>(masterId);
 		}
 
-		msg.addString(creature->isHealthHidden() ? "" : creature->getName());
+		const std::string& displayName = creature->getDisplayName();
+		msg.addString(!displayName.empty() ? displayName : (creature->isHealthHidden() ? "" : creature->getName()));
 	}
 
 	if (creature->isHealthHidden()) {
@@ -3933,7 +3940,10 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 	}
 
 	msg.addByte(creature->getSpeechBubble());
-	msg.addByte(0xFF); // MARK_UNMARKED
+
+	// (experimental) frame colors
+	msg.addByte(g_events->eventPlayerOnFrameView(player, creature)); 
+
 	msg.addByte(0x00); // inspection type (flags)
 	msg.addByte(player->canWalkthroughEx(creature) ? 0x00 : 0x01);
 }

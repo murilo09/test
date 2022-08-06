@@ -53,6 +53,9 @@ PlayerStorageKeys = {
 	imbuLastEquipItem = 70050,
 	imbuLastEquipSlot = 70051,
 	
+	-- one reward quest, multiple choices
+	yurPharaohQuest = 70100,
+	
 	-- rune to set podium item
 	-- scripts/actions/podiumRune.lua
 	podiumRune = 80040,

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<npc name="Mad" speechbubble="2" script="default.lua">
+ 	<look type="129" head="76" body="114" legs="124" feet="86"/>
+	<parameters>
+		<parameter key="message_greet" value="Hello |PLAYERNAME|! I buy swords, clubs, axes, helmets, boots, legs, shields and armors." />
+		<parameter key="module_shop" value="1" />
+		<parameter key="shop_sellable" value="royal helmet,2498,20000;warrior helmet,2475,3000;crusader helmet,2497,3000;crown helmet,2491,2000;devil helmet,2462,2000;mystic turban,2663,500;chain helmet,2458,35;iron helmet,2459,30;steel boots,2645,20000;boots of haste,2195,4000;magic plate armor,2472,100000;dragon scale mail,2492,30000;golden armor,2466,10000;crown armor,2487,5000;knight armor,2476,3000;blue robe,2656,3000;amazon armor,2500,1000;plate armor,2463,300;brass armor,2465,200;chain armor,2464,100;golden legs,2470,80000;crown legs,2488,5000;knight legs,2477,3000;plate legs,2647,500;brass legs,2478,100;chain legs,2648,50;mastermind shield,2514,80000;demon shield,2520,40000;vampire shield,2534,4000;medusa shield,2536,3500;amazon shield,2537,3000;crown shield,2519,2000;tower shield,2528,2000;dragon shield,2516,1500;guardian shield,2515,1200;bonelord shield,2518,1000;dwarven shield,2525,100;giant sword,2393,10000;bright sword,2407,6000;ice rapier,2396,4000;fire sword,2392,3000;serpent sword,2409,1500;spike sword,2383,800;two handed sword,2377,400;broad sword,2413,70;short sword,2406,30;sabre,2385,25;sword,2376,25;dragon lance,2414,10000;fire axe,2432,10000;knight axe,2430,2000;double axe,2387,200;halberd,2381,200;battle axe,2378,100;hatchet,2388,20;war hammer,2391,4000;skull staff,2436,4000;dragon hammer,2434,2000;clerical mace,2423,200;battle hammer,2417,60;mace,2398,30;platinum amulet,2171,2000;scarf,2661,500" />
+	</parameters>
+</npc>

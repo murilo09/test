@@ -6,6 +6,10 @@
 	<monster name="Paladin Familiar" file="monsters/paladin_familiar.xml" />
 	<monster name="Knight Familiar" file="monsters/knight_familiar.xml" />
 	
+	<!-- redirect old names -->
+	<monster name="Beholder" file="monsters/bonelord.xml" />
+	<monster name="Elder Beholder" file="monsters/elder_bonelord.xml" />
+
 	<!-- monsters -->
 	<monster name="a carved stone tile" file="monsters/a_carved_stone_tile.xml" />
 	<monster name="Abyssador" file="monsters/abyssador.xml" />

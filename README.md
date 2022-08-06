@@ -1,17 +1,14 @@
 The Forgotten Server Plus
 ===============
-The Forgotten Server Plus is a free and open-source MMORPG server emulator written in C++. It is a fork of the [The Forgotten Server](https://github.com/otland/forgottenserver) project.
+TFS+ is a free and open-source MMORPG server emulator written in C++.
+It is a fork of the [The Forgotten Server](https://github.com/otland/forgottenserver) project.
 
-Version Plus goals are:
-- Speeding up the development process
-- Maintaining the original repository code style
-- Bringing new game features faster
-- Expanding the engine possiblities
-
+We aim for rapid growth, development of new features and bringing back some most iconic content from the past.
 
 ### Resources
 
-* [Map Editor](https://github.com/Zbizu/rme) updated with new features and version 12 support
+* [Mehah OTClient](https://github.com/Mehah/OTClient) to connect to server
+* [Remere's Map Editor](https://github.com/OTAcademy/RME) updated with new features and client version support
 
 ### Getting Started
 
@@ -20,14 +17,10 @@ Version Plus goals are:
 
 ### Discussion
 
-* [Discord](https://discord.gg/otacademy)(:uk: :brazil: :poland: :es:) - If you ran into issues, want to suggest a new feature or just discuss the development of the server, visit "DEVELOPMENT" section of this multi-language community.
+* [Discord](https://discord.gg/OTAcademy)(:uk: :brazil: :poland: :es:) - If you ran into issues, want to suggest a new feature or just discuss the development of the server, visit development channels of this multi-language community.
 
 
-Don't want to use discord? You can also post in one of these sections:
-
-* [Issues](https://github.com/Zbizu/forgottenserver/issues)
-
-* [Discussions](https://github.com/Zbizu/forgottenserver/discussions)
+Don't want to use discord? You can also post in [issues](https://github.com/OTAcademy/server/issues).
 
 ### Notes
 

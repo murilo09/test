@@ -5,8 +5,8 @@
 #define FS_DEFINITIONS_H
 
 static constexpr auto STATUS_SERVER_NAME = "The Forgotten Server";
-static constexpr auto STATUS_SERVER_VERSION = "1.5 Plus";
-static constexpr auto STATUS_SERVER_DEVELOPERS = "Zbizu";
+static constexpr auto STATUS_SERVER_VERSION = "1.5 OTA";
+static constexpr auto STATUS_SERVER_DEVELOPERS = "OTAcademy";
 
 static constexpr auto CLIENT_VERSION_MIN = 1290;
 static constexpr auto CLIENT_VERSION_MAX = 1291;

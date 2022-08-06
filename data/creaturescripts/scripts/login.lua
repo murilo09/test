@@ -28,5 +28,8 @@ function onLogin(player)
 	-- Events
 	player:registerEvent("PlayerDeath")
 	player:registerEvent("DropLoot")
+	
+	player:registerEvent("guild_text")
+	player:registerEvent("guild_window")
 	return true
 end

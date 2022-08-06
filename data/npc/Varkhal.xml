@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<npc name="Varkhal" speechbubble="1" script="addon.lua">
+	<look type="134" head="78" body="88" legs="0" feet="88"/>
+</npc>

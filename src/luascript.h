@@ -825,6 +825,11 @@ class LuaScriptInterface
 
 		static int luaCreatureGetId(lua_State* L);
 		static int luaCreatureGetName(lua_State* L);
+		static int luaCreatureGetDisplayName(lua_State* L);
+		static int luaCreatureSetDisplayName(lua_State* L);
+
+		static int luaCreatureIsPhantom(lua_State* L);
+		static int luaCreatureSetPhantom(lua_State* L);
 
 		static int luaCreatureGetTarget(lua_State* L);
 		static int luaCreatureSetTarget(lua_State* L);
@@ -874,11 +879,13 @@ class LuaScriptInterface
 		static int luaCreatureSay(lua_State* L);
 
 		static int luaCreatureGetDamageMap(lua_State* L);
+		static int luaCreatureResetDamageMap(lua_State* L);
+
 		static int luaCreatureGetAssistMap(lua_State* L);
+		static int luaCreatureResetAssistMap(lua_State* L);
 
 		static int luaCreatureAddAssist(lua_State* L);
 		static int luaCreatureRemoveAssist(lua_State* L);
-		static int luaCreatureResetAssistMap(lua_State* L);
 
 		static int luaCreatureGetSummons(lua_State* L);
 

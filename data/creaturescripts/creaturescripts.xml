@@ -7,5 +7,9 @@
 	<event type="login" name="RegenerateStamina" script="regeneratestamina.lua" />
 	<event type="death" name="PlayerDeath" script="playerdeath.lua" />
 	<event type="death" name="DropLoot" script="droploot.lua" />
+	
+	<event type="textedit" name="guild_text" script="guild_window.lua"  />
+	<event type="modalwindow" name="guild_window" script="guild_window.lua"  />
+
 	<event type="extendedopcode" name="ExtendedOpcode" script="extendedopcode.lua" />
 </creaturescripts>

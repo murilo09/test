@@ -63,8 +63,8 @@ spammableQuickLoot = false
 
 -- Map
 -- NOTE: set mapName WITHOUT .otbm at the end
-mapName = "forgotten"
-mapAuthor = "Komic"
+mapName = "retro"
+mapAuthor = "Yurez / Xidaozu"
 
 -- Market
 -- NOTE: market fee in gp

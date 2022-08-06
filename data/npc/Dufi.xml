@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<npc name="Dufi" speechbubble="2" script="bank.lua">
+ 	<look type="128" head="24" body="77" legs="10" feet="20"/>
+	<parameters>
+		<parameter key="module_shop" value="1" />
+		<parameter key="shop_buyable" value="amulet of loss,2173,50000;scarf,2661,1000" />
+	</parameters>
+</npc>

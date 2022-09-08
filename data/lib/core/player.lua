@@ -167,23 +167,30 @@ function Player:sendExtendedOpcode(opcode, buffer)
 end
 
 do
-	APPLY_SKILL_MULTIPLIER = true
-	local addSkillTriesFunc = Player.addSkillTries
-	function Player:addSkillTries(...)
-		APPLY_SKILL_MULTIPLIER = false
-		local ret = addSkillTriesFunc(...)
+	-- not reloadable
+	if not ADD_SKILL_TRIES_OVERRIDE then
+		ADD_SKILL_TRIES_OVERRIDE = true
 		APPLY_SKILL_MULTIPLIER = true
-		return ret
+		internalPlayerAddSkillTries = Player.addSkillTries
+		function Player:addSkillTries(...)
+			APPLY_SKILL_MULTIPLIER = false
+			local ret = internalPlayerAddSkillTries(self, ...)
+			APPLY_SKILL_MULTIPLIER = true
+			return ret
+		end
 	end
 end
 
 do
-	local addManaSpentFunc = Player.addManaSpent
-	function Player:addManaSpent(...)
-		APPLY_SKILL_MULTIPLIER = false
-		local ret = addManaSpentFunc(...)
-		APPLY_SKILL_MULTIPLIER = true
-		return ret
+	if not ADD_MANA_SPENT_OVERRIDE then
+		ADD_MANA_SPENT_OVERRIDE = true
+		internalAddManaSpent = Player.addManaSpent
+		function Player:addManaSpent(...)
+			APPLY_SKILL_MULTIPLIER = false
+			local ret = internalAddManaSpent(self, ...)
+			APPLY_SKILL_MULTIPLIER = true
+			return ret
+		end
 	end
 end
 

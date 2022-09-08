@@ -876,7 +876,7 @@ end
 do
 	local creatureEvent = CreatureEvent("AutoLootDeath")
 	function creatureEvent.onDeath(player)
-		player:unregisterAutoLoot()
+		AutoLootWarnings[player:getId()] = nil
 		return true
 	end
 	creatureEvent:register()

@@ -151,6 +151,12 @@ bool Npc::loadFromXml()
 		baseSpeed = 100;
 	}
 
+	if ((attr = npcNode.attribute("currency"))) {
+		currencyId = pugi::cast<uint16_t>(attr.value());
+	} else {
+		currencyId = ITEM_GOLD_COIN;
+	}
+
 	if ((attr = npcNode.attribute("pushable"))) {
 		pushable = attr.as_bool();
 	}

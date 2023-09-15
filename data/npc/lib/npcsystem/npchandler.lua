@@ -59,6 +59,7 @@ if NpcHandler == nil then
 	TAG_ITEMCOUNT = "|ITEMCOUNT|"
 	TAG_TOTALCOST = "|TOTALCOST|"
 	TAG_ITEMNAME = "|ITEMNAME|"
+	TAG_CURRENCYNAME = "|CURRENCYNAME|"
 
 	NpcHandler = {
 		keywordHandler = nil,
@@ -67,6 +68,7 @@ if NpcHandler == nil then
 		idleTime = 120,
 		talkRadius = 3,
 		talkDelayTime = 1, -- Seconds to delay outgoing messages.
+		currencyId = ITEM_GOLD_COIN,
 		talkDelay = nil,
 		callbackFunctions = nil,
 		modules = nil,
@@ -80,10 +82,10 @@ if NpcHandler == nil then
 			[MESSAGE_FAREWELL] = "Good bye, |PLAYERNAME|.",
 			[MESSAGE_BUY] = "Do you want to buy |ITEMCOUNT| |ITEMNAME| for |TOTALCOST| gold coins?",
 			[MESSAGE_ONBUY] = "Here you are.",
-			[MESSAGE_BOUGHT] = "Bought |ITEMCOUNT|x |ITEMNAME| for |TOTALCOST| gold.",
+			[MESSAGE_BOUGHT] = "Bought |ITEMCOUNT|x |ITEMNAME| for |TOTALCOST| |CURRENCYNAME|.",
 			[MESSAGE_SELL] = "Do you want to sell |ITEMCOUNT| |ITEMNAME| for |TOTALCOST| gold coins?",
 			[MESSAGE_ONSELL] = "Here you are, |TOTALCOST| gold.",
-			[MESSAGE_SOLD] = "Sold |ITEMCOUNT|x |ITEMNAME| for |TOTALCOST| gold.",
+			[MESSAGE_SOLD] = "Sold |ITEMCOUNT|x |ITEMNAME| for |TOTALCOST| |CURRENCYNAME|.",
 			[MESSAGE_MISSINGMONEY] = "You don't have enough money.",
 			[MESSAGE_NEEDMONEY] = "You don't have enough money.",
 			[MESSAGE_MISSINGITEM] = "You don't have so many.",
@@ -360,6 +362,8 @@ if NpcHandler == nil then
 		local cid = creature:getId()
 		if cid == getNpcCid() and next(self.shopItems) then
 			local npc = Npc()
+			self.currencyId = npc:getCurrencyId()
+
 			local speechBubble = npc:getSpeechBubble()
 			if speechBubble == SPEECHBUBBLE_QUEST then
 				npc:setSpeechBubble(SPEECHBUBBLE_QUESTTRADER)

@@ -996,8 +996,22 @@ if Modules == nil then
 			[TAG_ITEMNAME] = shopItem.name
 		}
 
+		local currency = self.npcHandler.currencyId
+
 		-- player money check
-		if player:getTotalMoney() < totalCost then
+		local currencyName
+		local canBuy = false
+		if currency == ITEM_GOLD_COIN then
+			canBuy = player:getTotalMoney() >= totalCost
+			currencyName = "gold"
+		else
+			canBuy = player:getItemCount(currency) >= totalCost
+			currencyName = ItemType(currency):getName()
+		end
+
+		parseInfo[TAG_CURRENCYNAME] = currencyName
+		
+		if not canBuy then
 			local msg = self.npcHandler:getMessage(MESSAGE_NEEDMONEY)
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			player:sendCancelMessage(msg)
@@ -1010,18 +1024,33 @@ if Modules == nil then
 
 		-- payment
 		if amountSold > 0 or backpacksSold > 0 then
-			local realCost = (amountSold * shopItem.buy) + (backpacksSold * 20)
-			if not player:removeTotalMoney(realCost) then
-				local pos = player:getPosition()
-				print(
-					string.format(
-						"Warning: shop error, unable to remove money from player \"%s\", pos: %d %d %d, totalCost: %d, realCost: %d",
-						player:getName(),
-						pos.x, pos.y, pos.z,
-						totalCost,
-						realCost
+			if currency == ITEM_GOLD_COIN then
+				local realCost = (amountSold * shopItem.buy) + (backpacksSold * 20)
+				if not player:removeTotalMoney(realCost) then
+					local pos = player:getPosition()
+					print(
+						string.format(
+							"Warning: shop error, unable to remove money from player \"%s\", pos: %d %d %d, totalCost: %d, realCost: %d",
+							player:getName(),
+							pos.x, pos.y, pos.z,
+							totalCost,
+							realCost
+						)
 					)
-				)
+				end
+			else
+				if not player:removeItem(currency, totalCost) then
+					local pos = player:getPosition()
+					print(
+						string.format(
+							"Warning: shop error, unable to remove Item Id %d from player \"%s\", pos: %d %d %d, totalCost: %d",
+							currency,
+							player:getName(),
+							pos.x, pos.y, pos.z,
+							totalCost
+						)
+					)
+				end
 			end
 		end
 
@@ -1066,12 +1095,21 @@ if Modules == nil then
 			amount = math.min(amount, 100)
 		end
 		
+		local currencyName
+		local currency = self.npcHandler.currencyId
+		if currency == ITEM_GOLD_COIN then
+			currencyName = "gold"
+		else
+			currencyName = ItemType(currency):getName()
+		end
+		
 		local player = Player(cid)
 		local parseInfo = {
 			[TAG_PLAYERNAME] = player:getName(),
 			[TAG_ITEMCOUNT] = amount,
 			[TAG_TOTALCOST] = amount * shopItem.sell,
-			[TAG_ITEMNAME] = shopItem.name
+			[TAG_ITEMNAME] = shopItem.name,
+			[TAG_CURRENCYNAME] = currencyName
 		}
 
 		if not ItemType(itemid):isFluidContainer() then
@@ -1082,7 +1120,11 @@ if Modules == nil then
 			local msg = self.npcHandler:getMessage(MESSAGE_SOLD)
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			player:sendTextMessage(MESSAGE_INFO_DESCR, msg)
-			player:addMoney(amount * shopItem.sell)
+			if currency == ITEM_GOLD_COIN then
+				player:addMoney(amount * shopItem.sell)
+			else
+				player:addItem(currency, amount * shopItem.sell)
+			end
 			self.npcHandler.talkStart[cid] = os.time()
 			return true
 		else

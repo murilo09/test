@@ -10,28 +10,28 @@ do
 	--
 	local forgeMeta = {
 		[1] = { -- class
-			25000 -- price to fuse two [class 1, tier 0] items into one tier 1 item
+			[1] = {price = 25000, core = 1} -- price to fuse two [class 1, tier 0] items into one tier 1 item
 		},
 		[2] = {
-			750000, -- 750k
-			5 * STACK_100CC -- 5kk
+			[1] = {price = 750000}, -- 750k
+			[2] = {price = 5 * STACK_100CC, core = 1} -- 5kk
 		},
 		[3] = {
-			4 * STACK_100CC, -- 4kk
-			10 * STACK_100CC, -- 10kk
-			20 * STACK_100CC -- 20kk
+			[1] = {price = 4 * STACK_100CC, core = 1}, -- 4kk
+			[2] = {price = 10 * STACK_100CC, core = 2}, -- 10kk
+			[3] = {price = 20 * STACK_100CC, core = 3} -- 20kk
 		},
 		[4] = {
-			8 * STACK_100CC, -- 8kk
-			20 * STACK_100CC, -- 20kk
-			40 * STACK_100CC, -- 40kk
-			65 * STACK_100CC, -- 65kk
-			100 * STACK_100CC, -- 100kk
-			250 * STACK_100CC, -- 250kk
-			750 * STACK_100CC, -- 750kk
-			2500 * STACK_100CC, -- 2500kk
-			8000 * STACK_100CC, -- 8000kk
-			15000 * STACK_100CC -- 15000kk
+			[1] = {price = 8 * STACK_100CC, core = 1}, -- 8kk
+			[2] = {price = 20 * STACK_100CC, core = 1}, -- 20kk
+			[3] = {price = 40 * STACK_100CC, core = 2}, -- 40kk
+			[4] = {price = 65 * STACK_100CC, core = 5}, -- 65kk
+			[5] = {price = 100 * STACK_100CC, core = 10}, -- 100kk
+			[6] = {price = 250 * STACK_100CC, core = 15}, -- 250kk
+			[7] = {price = 750 * STACK_100CC, core = 25}, -- 750kk
+			[8] = {price = 2500 * STACK_100CC, core = 35}, -- 2500kk
+			[9] = {price = 8000 * STACK_100CC, core = 50}, -- 8000kk
+			[10] = {price = 15000 * STACK_100CC, core = 65} -- 15000kk
 		}
 	}
 

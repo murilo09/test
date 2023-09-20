@@ -1276,6 +1276,7 @@ do
 				m:addU32(math.min(monsterType:experience(), 0xFFFFFFFF)) -- exp
 				m:addU16(math.min(math.floor(monsterType:baseSpeed()/2), 0xFFFF)) -- speed
 				m:addU16(monsterType:armor()) -- armor
+				m:addDouble(0) -- mitigation
 			end
 
 			if progressLevel > 2 then
@@ -1320,6 +1321,7 @@ do
 				m:addU32(0) -- exp
 				m:addU16(0) -- speed
 				m:addU16(0) -- armor
+				m:addDouble(0) -- mitigation
 			end
 			
 			if progressLevel > 2 then

@@ -898,12 +898,12 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xBF: parseForgeAction(msg); break;
 		case 0xC0: parseForgeBrowseHistory(msg); break;
 		// 0xC1-0xC2 - empty
-		// 0xC3 - tournament ui 1
-		// 0xC4 - tournament ui 2
+		// 0xC3 - empty
+		// 0xC4 - empty
 		// 0xC5 - empty
-		// 0xC6 - tournament ui 3
-		// 0xC7 - tournament ui 4
-		// 0xC8 - tournament ui 5
+		// 0xC6 - empty
+		// 0xC7 - empty
+		// 0xC8 - empty
 		case 0xC9: /* update tile */ break;
 		case 0xCA: parseUpdateContainer(msg); break;
 		case 0xCB: parseBrowseField(msg); break;
@@ -2086,7 +2086,6 @@ void ProtocolGame::sendClientFeatures()
 	msg.add<uint16_t>(25); // premium coin package size
 
 	msg.addByte(0x00); // exiva button enabled (bool)
-	msg.addByte(0x00); // Tournament button (bool)
 
 	writeToOutputBuffer(msg);
 }
@@ -2103,12 +2102,16 @@ void ProtocolGame::sendBasicData()
 		msg.add<uint32_t>(0);
 	}
 	msg.addByte(player->getVocation()->getClientId());
-	msg.addByte(0x01); // has reached mainland (bool)
+	if (player->getVocation()->getId() == 0) {
+		msg.addByte(0x00);
+	} else {
+		msg.addByte(0x01); // has reached mainland (bool)
+	}
 
 	// unlock spells on action bar
 	msg.add<uint16_t>(0xFF);
-	for (uint8_t spellId = 0x00; spellId < 0xFF; spellId++) {
-		msg.addByte(spellId);
+	for (uint16_t spellId = 0x00; spellId < 0xFF; spellId++) {
+		msg.add<uint16_t>(spellId);
 	}
 
 	msg.addByte(0x00); // is magic shield active (bool)
@@ -2445,7 +2448,6 @@ void ProtocolGame::sendStoreBalance()
 	msg.add<int32_t>(storeCoins + player->getAccountResource(ACCOUNTRESOURCE_STORE_COINS_NONTRANSFERABLE)); // total store coins (transferable + non-t)
 	msg.add<int32_t>(storeCoins); // transferable store coins
 	msg.add<int32_t>(player->getAccountResource(ACCOUNTRESOURCE_STORE_COINS_RESERVED)); // reserved auction coins
-	msg.add<int32_t>(player->getAccountResource(ACCOUNTRESOURCE_TOURNAMENT_COINS)); // tournament coins
 	writeToOutputBuffer(msg);
 }
 
@@ -3787,7 +3789,7 @@ void ProtocolGame::sendSpellCooldown(uint8_t spellId, uint32_t time)
 {
 	NetworkMessage msg;
 	msg.addByte(0xA4);
-	msg.addByte(spellId);
+	msg.add<uint16_t>(spellId);
 	msg.add<uint32_t>(time);
 	writeToOutputBuffer(msg);
 }
@@ -3982,13 +3984,8 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 {
 	msg.addByte(0xA0);
 
-	if (player->getMaxHealth() < std::numeric_limits<uint16_t>::max()) {
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getHealth()));
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getMaxHealth()));
-	} else {
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getHealth() * 10000.0 / player->getMaxHealth()));
-		msg.add<uint16_t>(10000);
-	}
+	msg.add<uint32_t>(player->getHealth());
+	msg.add<uint32_t>(player->getMaxHealth());
 
 	msg.add<uint32_t>(player->hasFlag(PlayerFlag_HasInfiniteCapacity) ? 1000000 : player->getFreeCapacity());
 	msg.add<uint64_t>(player->getExperience());
@@ -4001,13 +3998,8 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint16_t>(0); // xp boost
 	msg.add<uint16_t>(100); // stamina multiplier (100 = x1.0)
 
-	if (player->getMaxMana() < std::numeric_limits<uint16_t>::max()) {
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getMana()));
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getMaxMana()));
-	} else {
-		msg.add<uint16_t>(static_cast<uint16_t>(player->getMana() * 10000.0 / player->getMaxMana()));
-		msg.add<uint16_t>(10000);
-	}
+	msg.add<uint32_t>(player->getMana());
+	msg.add<uint32_t>(player->getMaxMana());
 
 	msg.addByte(player->getSoul());
 	msg.add<uint16_t>(player->getStaminaMinutes());
@@ -4021,8 +4013,8 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint16_t>(0); // xp boost time (seconds)
 	msg.addByte(0x00); // enables exp boost in the store
 
-	msg.add<uint16_t>(0);  // remaining mana shield
-	msg.add<uint16_t>(0);  // total mana shield
+	msg.add<uint32_t>(0);  // remaining mana shield
+	msg.add<uint32_t>(0);  // total mana shield
 }
 
 void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
@@ -4047,8 +4039,12 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 		msg.add<uint16_t>(0); // base special skill
 	}
 
+	// 13.10 list (U8 + U16)
+	msg.addByte(0);
+
 	// cap
 	if (!player->hasFlag(PlayerFlag_HasInfiniteCapacity)) {
+		// used for imbuement (Feather)
 		msg.add<uint32_t>(player->getCapacity());
 		msg.add<uint32_t>(player->getBaseCapacity());
 	} else {

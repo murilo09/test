@@ -8,9 +8,9 @@ static constexpr auto STATUS_SERVER_NAME = "The Forgotten Server";
 static constexpr auto STATUS_SERVER_VERSION = "1.5 OTA";
 static constexpr auto STATUS_SERVER_DEVELOPERS = "OTAcademy";
 
-static constexpr auto CLIENT_VERSION_MIN = 1290;
-static constexpr auto CLIENT_VERSION_MAX = 1291;
-static constexpr auto CLIENT_VERSION_STR = "12.90";
+static constexpr auto CLIENT_VERSION_MIN = 1315;
+static constexpr auto CLIENT_VERSION_MAX = 1316;
+static constexpr auto CLIENT_VERSION_STR = "13.16";
 
 static constexpr auto AUTHENTICATOR_DIGITS = 6U;
 static constexpr auto AUTHENTICATOR_PERIOD = 30U;

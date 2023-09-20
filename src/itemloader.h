@@ -95,6 +95,7 @@ enum clientVersion_t {
 	CLIENT_VERSION_1286 = 62,
 	CLIENT_VERSION_1287 = 63,
 	CLIENT_VERSION_1290 = 64,
+	CLIENT_VERSION_1316 = 65,
 
 	// lowest supported otb version on the server
 	CLIENT_VERSION_LAST = CLIENT_VERSION_1290

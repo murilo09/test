@@ -3,6 +3,7 @@ function Player:sendItemInspection(item, descriptions, openCyclopedia, isVirtual
 	response:addByte(0x76)
 	response:addByte(0x00) -- responseType 0x00 = ok
 	response:addByte(openCyclopedia and 0x01 or 0x00)
+	response:addU32(self:getId()) -- Creature ID 13.00
 	response:addByte(0x01) --?
 	
 	if tonumber(item) then

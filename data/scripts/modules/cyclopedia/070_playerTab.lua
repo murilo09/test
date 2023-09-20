@@ -43,7 +43,6 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 		response:addU16(isPlayer and creature:getLevel() or 1)
 		response:addOutfit(creature:getOutfit(), false)
 		response:addByte(0x00) -- hide stamina (hidden if 0x01)
-		response:addByte(0x01) -- enable store summary and character titles
 		response:addString("") -- character title
 		response:sendToPlayer(player)
 		return
@@ -63,7 +62,6 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 		response:addByte(progress)
 	
 		response:addU16(100) -- base XP rate
-		response:addU32(0) -- tournament XP factor
 		response:addU16(0) -- low level bonus
 		response:addU16(0) -- XP boost
 		response:addU16(100) -- stamina boost
@@ -78,8 +76,8 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 			maxHP = 100
 		end
 
-		response:addU16(math.min(HP, maxHP))
-		response:addU16(maxHP)
+		response:addU32(math.min(HP, maxHP))
+		response:addU32(maxHP)
 
 		local MP = creature:getMana() or 0
 		local maxMP = creature:getMaxMana() or 0
@@ -89,8 +87,8 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 			maxMP = 100
 		end
 
-		response:addU16(math.min(MP, maxMP))
-		response:addU16(maxMP)
+		response:addU32(math.min(MP, maxMP))
+		response:addU32(maxMP)
 
 		response:addByte(creature:getSoul())
 		response:addU16(creature:getStamina())
@@ -171,6 +169,7 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 
 		response:addU16(0) -- armor
 		response:addU16(0) -- defense
+		response:addDouble(0) -- mitigation
 
 		-- element resistances count
 		response:addByte(0)

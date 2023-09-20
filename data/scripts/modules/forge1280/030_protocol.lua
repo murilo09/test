@@ -114,7 +114,7 @@ do
 					end
 				end
 				
-				m:addByte(self:getForgeDustLimit())
+				m:addU16(self:getForgeDustLimit())
 				m:sendToPlayer(self)
 				return
 			end
@@ -223,7 +223,7 @@ do
 			end
 		end
 		
-		m:addByte(self:getForgeDustLimit())
+		m:addU16(self:getForgeDustLimit())
 		m:sendToPlayer(self)
 
 		if not loadFromCache then
@@ -236,7 +236,7 @@ do
 		m:addByte(FORGE_RESPONSE_BASE)
 		m:addU16(0)
 		m:addByte(0)
-		m:addByte(self:getForgeDustLimit())
+		m:addU16(self:getForgeDustLimit())
 		m:sendToPlayer(self)
 	end
 end
@@ -360,15 +360,22 @@ function Player:sendItemClasses()
 			if #classData > 0 then
 				for tierId = 0, #classData-1 do
 					msg:addByte(tierId)
-					msg:addU64(classData[tierId+1])
+					msg:addU64(classData[tierId+1].price)
 				end
 			end
 		end
 	end
-	
+
+	-- exalted core per tier
+	msg:addByte(0);
+
 	-- other metadata
 	for i = 1, #forgeOrder do
-		msg:addByte(forgeData[forgeOrder[i]])
+		if forgeOrder[i] == "minStoredDustLimit" or forgeOrder[i] == "maxStoredDustLimit" then
+			msg:addU16(forgeData[forgeOrder[i]])
+		else
+			msg:addByte(forgeData[forgeOrder[i]])
+		end
 	end
 	
 	msg:sendToPlayer(self)

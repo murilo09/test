@@ -331,6 +331,8 @@ ec.onLookInMarket = function(self, itemType, tier)
 	
 	-- weight
 	response:addString(string.format("%0.2f", itemType:getWeight()/100))
+
+	response:addU16(0) -- Augment
 	
 	-- Imbuement Slots
 	if ImbuingSystem then

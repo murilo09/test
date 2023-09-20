@@ -456,6 +456,7 @@ void ProtocolGame::fastRelog(const std::string& otherPlayerName)
 
 	// send client info
 	sendClientFeatures(); // player speed, bug reports, store url, pvp mode, etc
+	sendAllowBugReport(); // can report bugs?
 	sendBasicData(); // premium account, vocation, known spells, prey system status, magic shield status
 	sendItems(); // send carried items for action bars
 
@@ -2076,9 +2077,6 @@ void ProtocolGame::sendClientFeatures()
 	msg.addDouble(Creature::speedB, 3);
 	msg.addDouble(Creature::speedC, 3);
 
-	// can report bugs?
-	msg.addByte(player->getAccountType() >= ACCOUNT_TYPE_TUTOR ? 0x01 : 0x00);
-
 	msg.addByte(0x00); // can change pvp framing option
 	msg.addByte(0x00); // expert mode button enabled
 
@@ -2233,6 +2231,7 @@ void ProtocolGame::sendIcons(uint32_t icons)
 	NetworkMessage msg;
 	msg.addByte(0xA2);
 	msg.add<uint32_t>(icons);
+	msg.addByte(0x00); // 13.20 icon counter
 	writeToOutputBuffer(msg);
 }
 
@@ -2995,20 +2994,20 @@ void ProtocolGame::sendPingBack()
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint8_t type)
+void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint16_t type)
 {
 	NetworkMessage msg;
 	msg.addByte(0x83);
 	msg.addPosition(from);
 	msg.addByte(MAGIC_EFFECTS_CREATE_DISTANCEEFFECT);
-	msg.addByte(type);
+	msg.add<uint16_t>(type);
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.x) - static_cast<int32_t>(from.x))));
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.y) - static_cast<int32_t>(from.y))));
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendMagicEffect(const Position& pos, uint8_t type)
+void ProtocolGame::sendMagicEffect(const Position& pos, uint16_t type)
 {
 	if (!canSee(pos)) {
 		return;
@@ -3018,7 +3017,7 @@ void ProtocolGame::sendMagicEffect(const Position& pos, uint8_t type)
 	msg.addByte(0x83);
 	msg.addPosition(pos);
 	msg.addByte(MAGIC_EFFECTS_CREATE_EFFECT);
-	msg.addByte(type);
+	msg.add<uint16_t>(type);
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
@@ -3203,6 +3202,17 @@ void ProtocolGame::sendFightModes()
 	writeToOutputBuffer(msg);
 }
 
+void ProtocolGame::sendAllowBugReport() {
+	NetworkMessage msg;
+	msg.addByte(0x1A);
+	if (player->getAccountType() >= ACCOUNT_TYPE_TUTOR) {
+		msg.addByte(0x01);
+	} else {
+		msg.addByte(0x00);
+	}
+	writeToOutputBuffer(msg);
+}
+
 void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos, int32_t stackpos, MagicEffectClasses magicEffect/*= CONST_ME_NONE*/)
 {
 	if (!canSee(pos)) {
@@ -3248,6 +3258,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 
 	// send client info
 	sendClientFeatures(); // player speed, bug reports, store url, pvp mode, etc
+	sendAllowBugReport(); // can report bugs?
 	sendBasicData(); // premium account, vocation, known spells, prey system status, magic shield status
 	sendItems(); // send carried items for action bars
 
@@ -4035,6 +4046,9 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 
 	// crit, leech, tier bonuses
 	for (uint8_t i = SPECIALSKILL_FIRST; i <= SPECIALSKILL_LAST; ++i) {
+		if (i == SPECIALSKILL_LIFELEECHCHANCE || i == SPECIALSKILL_MANALEECHCHANCE) {
+			continue;
+		}
 		msg.add<uint16_t>(std::min<int32_t>(std::numeric_limits<uint16_t>::max(), player->varSpecialSkills[i])); // base + bonus special skill
 		msg.add<uint16_t>(0); // base special skill
 	}

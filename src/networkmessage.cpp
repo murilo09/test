@@ -92,7 +92,6 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 		addByte(count == 0 ? count : fluidMap[count & 7]);
 	} else if (it.type == ITEM_TYPE_CONTAINER || it.type == ITEM_TYPE_DEPOT) {
 		addByte(0x00); // assigned loot container icon
-		addByte(0x00); // quiver ammo count
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
 
@@ -158,23 +157,26 @@ void NetworkMessage::addItem(const Item* item)
 	}
 
 	if (it.type == ITEM_TYPE_CONTAINER || it.type == ITEM_TYPE_DEPOT) {
+		uint8_t containerType = 0;
+
 		const Container* container = item->getContainer();
 		const Player* player = item->getHoldingPlayer();
 
 		// assigned loot container icon
-		if (container && player) {
-			addByte(0x01);
+		if (container && containerType == 0 && player) {
+			containerType = 1;
+			addByte(containerType);
 			add<uint32_t>(player->getContainerFlags(container));
-		} else {
-			// no one holds the item, send no icon
-			addByte(0x00);
 		}
 
 		// quiver ammo count
-		if (container && it.weaponType == WEAPON_QUIVER) {
-			addByte(0x01);
+		if (container && containerType == 0 && it.weaponType == WEAPON_QUIVER) {
+			containerType = 2;
+			addByte(containerType);
 			add<uint32_t>(container->getAmmoCount());
-		} else {
+		}
+		
+		if (containerType == 0) {
 			addByte(0x00);
 		}
 	}

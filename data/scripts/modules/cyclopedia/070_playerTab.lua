@@ -138,8 +138,10 @@ function sendCyclopediaPlayerInfo(playerId, creatureId, infoType, entriesPerPage
 		return
 	elseif infoType == PLAYERTAB_COMBAT then
 		for skillId = SPECIALSKILL_CRITICALHITCHANCE, SPECIALSKILL_MANALEECHAMOUNT do
-			response:addU16(isPlayer and creature:getSpecialSkill(skillId) or 0)
-			response:addU16(0)
+			if skillId ~= SPECIALSKILL_LIFELEECHCHANCE and skillId ~= SPECIALSKILL_MANALEECHCHANCE then
+				response:addU16(isPlayer and creature:getSpecialSkill(skillId) or 0)
+				response:addU16(0)
+			end
 		end
 
 		-- fatal, dodge, momentum

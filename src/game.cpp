@@ -4369,7 +4369,7 @@ bool Game::combatBlockHit(CombatDamage& damage, Creature* attacker, Creature* ta
 	return (primaryBlockType != BLOCK_NONE) && (secondaryBlockType != BLOCK_NONE);
 }
 
-void Game::combatGetTypeInfo(CombatType_t combatType, Creature* target, TextColor_t& color, uint8_t& effect)
+void Game::combatGetTypeInfo(CombatType_t combatType, Creature* target, TextColor_t& color, uint16_t& effect)
 {
 	switch (combatType) {
 		case COMBAT_PHYSICALDAMAGE: {
@@ -4716,7 +4716,7 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		message.primary.value = damage.primary.value;
 		message.secondary.value = damage.secondary.value;
 
-		uint8_t hitEffect;
+		uint16_t hitEffect;
 		if (message.primary.value) {
 			combatGetTypeInfo(damage.primary.type, target, message.primary.color, hitEffect);
 			if (hitEffect != CONST_ME_NONE) {
@@ -4931,14 +4931,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const Creature* tar
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (Creature* spectator : spectators) {
 		if (Player* tmpPlayer = spectator->getPlayer()) {
@@ -4947,7 +4947,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4957,7 +4957,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 	addDistanceEffect(spectators, fromPos, toPos, effect);
 }
 
-void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	for (Creature* spectator : spectators) {
 		if (Player* tmpPlayer = spectator->getPlayer()) {

@@ -130,7 +130,7 @@ function Player:onPodiumRequest(item)
 		self:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
 		return
 	end
-	
+
 	self:sendEditPodium(item)
 end
 
@@ -140,19 +140,19 @@ function Player:onPodiumEdit(item, outfit, direction, isVisible)
 		self:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
 		return
 	end
-	
+
 	if not self:getGroup():getAccess() then
 		-- check if the player is in melee range
 		if getDistanceBetween(self:getPosition(), item:getPosition()) > 1 then
 			self:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
 			return
 		end
-		
+
 		-- reset outfit if unable to wear
 		if not self:canWearOutfit(outfit.lookType, outfit.lookAddons) then
 			outfit.lookType = 0
 		end
-		
+
 		-- reset mount if unable to ride
 		local mount = Game.getMountIdByLookType(outfit.lookMount)
 		if not (mount and self:hasMount(mount)) then
@@ -162,7 +162,7 @@ function Player:onPodiumEdit(item, outfit, direction, isVisible)
 
 	local podiumOutfit = podium:getOutfit()
 	local playerOutfit = self:getOutfit()
-	
+
 	-- use player outfit if podium is empty
 	if podiumOutfit.lookType == 0 then
 		podiumOutfit.lookType = playerOutfit.lookType
@@ -181,7 +181,7 @@ function Player:onPodiumEdit(item, outfit, direction, isVisible)
 		podiumOutfit.lookMountLegs = playerOutfit.lookMountLegs
 		podiumOutfit.lookMountFeet = playerOutfit.lookMountFeet
 	end
-	
+
 	-- "outfit" box checked
 	if outfit.lookType ~= 0 then
 		podiumOutfit.lookType = outfit.lookType
@@ -229,7 +229,7 @@ local function getSpentStaminaMinutes(player)
 	if timePassed <= 0 then
 		return 0
 	end
-	
+
 	return timePassed > 60 and 2 or 1
 end
 
@@ -375,18 +375,18 @@ function Player:onMinimapQuery(position)
 	if onMinimapQuery then
 		onMinimapQuery(self, position)
 	end
-	
+
 	-- teleport action for server staff
 	-- ctrl + shift + click on minimap
 	if not self:getGroup():getAccess() then
 		return
 	end
-	
+
 	local tile = Tile(position)
 	if not tile then
 		Game.createTile(position)
 	end
-	
+
 	self:teleportTo(position)
 end
 
@@ -469,7 +469,7 @@ function Player:onFrameView(targetId)
 	if player and player:isAdmin() then
 		return 3
 	end
-	
+
 	return 255
 end
 
@@ -512,7 +512,7 @@ function setPacketEvent(recvbyte, callback)
 		packetEvents[tonumber(recvbyte)] = callback
 		return true
 	end
-	
+
 	return false
 end
 
@@ -520,7 +520,7 @@ function callPacketEvent(player, recvbyte, networkMessage)
 	if packetEvents[recvbyte] then
 		return packetEvents[recvbyte](player, recvbyte, networkMessage)
 	end
-	
+
 	return false
 end
 

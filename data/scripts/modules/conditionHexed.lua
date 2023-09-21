@@ -36,17 +36,17 @@ function Creature:setHex(hexLevel, duration)
 	elseif hexLevel > 3 then
 		return false
 	end
-	
+
 	local condition = Condition(CONDITION_ATTRIBUTES)
 	condition:setParameter(CONDITION_PARAM_SUBID, CONDITION_SUBID_HEXED)
 	condition:setParameter(CONDITION_PARAM_TICKS, duration)
 	condition:setParameter(CONDITION_PARAM_ICONS, hex[hexLevel].icon)
-	
+
 	if hex[hexLevel].HPPercent then
 		condition:setParameter(CONDITION_PARAM_STAT_MAXHITPOINTSPERCENT, hex[hexLevel].HPPercent)
 	end
-	
-	self:addCondition(condition)	
+
+	self:addCondition(condition)
 	return true
 end
 
@@ -55,7 +55,7 @@ function Creature:getHexLevel()
 	if not cond then
 		return 0
 	end
-	
+
 	return iconToLevel[cond:getIcons()] or 0
 end
 
@@ -77,7 +77,7 @@ do
 			if not hexInfo then
 				return primaryDamage, primaryType, secondaryDamage, secondaryType
 			end
-			
+
 			local healMod = hexInfo.healingPercent
 			if primaryType == COMBAT_HEALING and healMod then
 				primaryDamage = primaryDamage * healMod / 100
@@ -96,7 +96,7 @@ do
 				if not hexInfo then
 					return primaryDamage, primaryType, secondaryDamage, secondaryType
 				end
-				
+
 				local damageMod = hexInfo.damagePercent
 				if primaryType ~= COMBAT_HEALING and damageMod then
 					primaryDamage = primaryDamage * damageMod / 100
@@ -107,7 +107,7 @@ do
 				end
 			end
 		end
-		
+
 		return primaryDamage, primaryType, secondaryDamage, secondaryType
 	end
 	creatureevent:register()
@@ -121,7 +121,7 @@ do
 		return true
 	end
 	creatureevent:register()
-	
+
 	local ec = EventCallback
 	ec.onSpawn = function(self, position, startup, artificial)
 		self:registerEvent("HexStatus")

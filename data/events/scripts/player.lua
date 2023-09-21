@@ -1,107 +1,120 @@
 function Player:onBrowseField(position)
-	if EventCallback.onBrowseField then
-		return EventCallback.onBrowseField(self, position)
+	local onBrowseField = EventCallback.onBrowseField
+	if onBrowseField then
+		return onBrowseField(self, position)
 	end
 	return true
 end
 
 function Player:onLook(thing, position, distance)
 	local description = ""
-	if EventCallback.onLook then
-		description = EventCallback.onLook(self, thing, position, distance, description)
+	local onLook = EventCallback.onLook
+	if onLook then
+		description = onLook(self, thing, position, distance, description)
 	end
 	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 function Player:onLookInBattleList(creature, distance)
 	local description = ""
-	if EventCallback.onLookInBattleList then
-		description = EventCallback.onLookInBattleList(self, creature, distance, description)
+	local onLookInBattleList = EventCallback.onLookInBattleList
+	if onLookInBattleList then
+		description = onLookInBattleList(self, creature, distance, description)
 	end
 	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 function Player:onLookInTrade(partner, item, distance)
 	local description = "You see " .. item:getDescription(distance)
-	if EventCallback.onLookInTrade then
-		description = EventCallback.onLookInTrade(self, partner, item, distance, description)
+	local onLookInTrade = EventCallback.onLookInTrade
+	if onLookInTrade then
+		description = onLookInTrade(self, partner, item, distance, description)
 	end
 	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 function Player:onLookInShop(itemType, count, npc)
 	local description = "You see "
-	if EventCallback.onLookInShop then
-		description = EventCallback.onLookInShop(self, itemType, count, description, npc)
+	local onLookInShop = EventCallback.onLookInShop
+	if onLookInShop then
+		description = onLookInShop(self, itemType, count, description)
 	end
-	
 	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 function Player:onLookInMarket(itemType, tier)
-	if EventCallback.onLookInMarket then
-		EventCallback.onLookInMarket(self, itemType, tier)
+	local onLookInMarket = EventCallback.onLookInMarket
+	if onLookInMarket then
+		onLookInMarket(self, itemType)
 	end
 end
 
 function Player:onMoveItem(item, count, fromPosition, toPosition, fromCylinder, toCylinder)
-	if EventCallback.onMoveItem then
-		return EventCallback.onMoveItem(self, item, count, fromPosition, toPosition, fromCylinder, toCylinder)
+	local onMoveItem = EventCallback.onMoveItem
+	if onMoveItem then
+		return onMoveItem(self, item, count, fromPosition, toPosition, fromCylinder, toCylinder)
 	end
-	
 	return RETURNVALUE_NOERROR
 end
 
 function Player:onItemMoved(item, count, fromPosition, toPosition, fromCylinder, toCylinder)
-	if EventCallback.onItemMoved then
-		EventCallback.onItemMoved(self, item, count, fromPosition, toPosition, fromCylinder, toCylinder)
+	local onItemMoved = EventCallback.onItemMoved
+	if onItemMoved then
+		onItemMoved(self, item, count, fromPosition, toPosition, fromCylinder, toCylinder)
 	end
 end
 
 function Player:onMoveCreature(creature, fromPosition, toPosition)
-	if EventCallback.onMoveCreature then
-		return EventCallback.onMoveCreature(self, creature, fromPosition, toPosition)
+	local onMoveCreature = EventCallback.onMoveCreature
+	if onMoveCreature then
+		return onMoveCreature(self, creature, fromPosition, toPosition)
 	end
 	return true
 end
 
 function Player:onReportRuleViolation(targetName, reportType, reportReason, comment, translation)
-	if EventCallback.onReportRuleViolation then
-		EventCallback.onReportRuleViolation(self, targetName, reportType, reportReason, comment, translation)
+	local onReportRuleViolation = EventCallback.onReportRuleViolation
+	if onReportRuleViolation then
+		onReportRuleViolation(self, targetName, reportType, reportReason, comment, translation)
 	end
 end
 
 function Player:onReportBug(message, position, category)
-	if EventCallback.onReportBug then
-		return EventCallback.onReportBug(self, message, position, category)
+	local onReportBug = EventCallback.onReportBug
+	if onReportBug then
+		return onReportBug(self, message, position, category)
 	end
 	return true
 end
 
 function Player:onTurn(direction)
-	if EventCallback.onTurn then
-		return EventCallback.onTurn(self, direction)
+	local onTurn = EventCallback.onTurn
+	if onTurn then
+		return onTurn(self, direction)
 	end
 	return true
 end
 
 function Player:onTradeRequest(target, item)
-	if EventCallback.onTradeRequest then
-		return EventCallback.onTradeRequest(self, target, item)
+	local onTradeRequest = EventCallback.onTradeRequest
+	if onTradeRequest then
+		return onTradeRequest(self, target, item)
 	end
 	return true
 end
 
 function Player:onTradeAccept(target, item, targetItem)
-	if EventCallback.onTradeAccept then
-		return EventCallback.onTradeAccept(self, target, item, targetItem)
+	local onTradeAccept = EventCallback.onTradeAccept
+	if onTradeAccept then
+		return onTradeAccept(self, target, item, targetItem)
 	end
 	return true
 end
 
 function Player:onTradeCompleted(target, item, targetItem, isSuccess)
-	if EventCallback.onTradeCompleted then
-		EventCallback.onTradeCompleted(self, target, item, targetItem, isSuccess)
+	local onTradeCompleted = EventCallback.onTradeCompleted
+	if onTradeCompleted then
+		onTradeCompleted(self, target, item, targetItem, isSuccess)
 	end
 end
 
@@ -186,8 +199,8 @@ function Player:onPodiumEdit(item, outfit, direction, isVisible)
 	if outfit.lookType == 0 and outfit.lookMount == 0 then
 		isVisible = true
 	end
-	
-	-- save player choices		
+
+	-- save player choices
 	podium:setFlag(PODIUM_SHOW_PLATFORM, isVisible)
 	podium:setFlag(PODIUM_SHOW_OUTFIT, outfit.lookType ~= 0)
 	podium:setFlag(PODIUM_SHOW_MOUNT, outfit.lookMount ~= 0)
@@ -217,14 +230,14 @@ end
 function useStamina(player)
 	local staminaMinutes = player:getStamina()
 	if staminaMinutes == 0 then
-		if EventCallback.onUseStamina then
+		local onUseStamina = EventCallback.onUseStamina
+		if onUseStamina then
 			local spentMinutes = getSpentStaminaMinutes(player)
 			if spentMinutes > 0 then
-				staminaMinutes = EventCallback.onUseStamina(player, staminaMinutes, spentMinutes)
+				staminaMinutes = onUseStamina(player, staminaMinutes, spentMinutes)
 				player:setStamina(staminaMinutes)
 			end
 		end
-		
 		return
 	end
 
@@ -242,11 +255,12 @@ function useStamina(player)
 		staminaMinutes = staminaMinutes - 1
 		nextUseStaminaTime[player:getId()] = os.time() + 60
 	end
-	
-	if EventCallback.onUseStamina then
-		staminaMinutes = EventCallback.onUseStamina(player, staminaMinutes, spentMinutes)
+
+	local onUseStamina = EventCallback.onUseStamina
+	if onUseStamina then
+		staminaMinutes = onUseStamina(player, staminaMinutes, spentMinutes)
 	end
-	
+
 	player:setStamina(staminaMinutes)
 end
 
@@ -277,14 +291,17 @@ function Player:onGainExperience(source, exp, rawExp)
 		end
 	end
 
-	return EventCallback.onGainExperience and EventCallback.onGainExperience(self, source, exp, rawExp) or exp
+	local onGainExperience = EventCallback.onGainExperience
+	return onGainExperience and EventCallback.onGainExperience(self, source, exp, rawExp) or exp
 end
 
 function Player:onLoseExperience(exp)
-	return EventCallback.onLoseExperience and EventCallback.onLoseExperience(self, exp) or exp
+	local onLoseExperience = EventCallback.onLoseExperience
+	return onLoseExperience and onLoseExperience(self, exp) or exp
 end
 
 function Player:onGainSkillTries(skill, tries)
+	local onGainSkillTries = EventCallback.onGainSkillTries
 	if APPLY_SKILL_MULTIPLIER == false then
 		return EventCallback.onGainSkillTries and EventCallback.onGainSkillTries(self, skill, tries) or tries
 	end
@@ -294,12 +311,13 @@ function Player:onGainSkillTries(skill, tries)
 		return EventCallback.onGainSkillTries and EventCallback.onGainSkillTries(self, skill, tries) or tries
 	end
 	tries = tries * configManager.getNumber(configKeys.RATE_SKILL)
-	return EventCallback.onGainSkillTries and EventCallback.onGainSkillTries(self, skill, tries) or tries
+	return onGainSkillTries and onGainSkillTries(self, skill, tries) or tries
 end
 
 function Player:onWrapItem(item)
-	if EventCallback.onWrapItem then
-		EventCallback.onWrapItem(self, item)
+	local onWrapItem = EventCallback.onWrapItem
+	if onWrapItem then
+		onWrapItem(self, item)
 	end
 end
 
@@ -310,40 +328,46 @@ function Player:onQuickLoot(position, stackPos, spriteId)
 end
 
 function Player:onInventoryUpdate(item, slot, equip)
-	if EventCallback.onInventoryUpdate then
-		EventCallback.onInventoryUpdate(self, item, slot, equip)
+	local onInventoryUpdate = EventCallback.onInventoryUpdate
+	if onInventoryUpdate then
+		onInventoryUpdate(self, item, slot, equip)
 	end
 end
 
 -- begin inspection feature
 function Player:onInspectItem(item)
-	if EventCallback.onInspectItem then
-		EventCallback.onInspectItem(self, item)
+	local onInspectItem = EventCallback.onInspectItem
+	if onInspectItem then
+		onInspectItem(self, item)
 	end
 end
 
 function Player:onInspectTradeItem(tradePartner, item)
-	if EventCallback.onInspectTradeItem then
-		EventCallback.onInspectTradeItem(self, tradePartner, item)
+	local onInspectTradeItem = EventCallback.onInspectTradeItem
+	if onInspectTradeItem then
+		onInspectTradeItem(self, tradePartner, item)
 	end
 end
 
 function Player:onInspectNpcTradeItem(npc, itemId)
-	if EventCallback.onInspectNpcTradeItem then
-		EventCallback.onInspectNpcTradeItem(self, npc, itemId)
+	local onInspectNpcTradeItem = EventCallback.onInspectNpcTradeItem
+	if onInspectNpcTradeItem then
+		onInspectNpcTradeItem(self, npc, itemId)
 	end
 end
 
 function Player:onInspectCyclopediaItem(itemId)
-	if EventCallback.onInspectCyclopediaItem then
-		EventCallback.onInspectCyclopediaItem(self, itemId)
+	local onInspectCyclopediaItem = EventCallback.onInspectCyclopediaItem
+	if onInspectCyclopediaItem then
+		onInspectCyclopediaItem(self, itemId)
 	end
 end
 -- end inspection feature
 
 function Player:onMinimapQuery(position)
-	if EventCallback.onMinimapQuery then
-		EventCallback.onMinimapQuery(self, position)
+	local onMinimapQuery = EventCallback.onMinimapQuery
+	if onMinimapQuery then
+		onMinimapQuery(self, position)
 	end
 	
 	-- teleport action for server staff
@@ -365,62 +389,72 @@ function Player:onGuildMotdEdit(message)
 end
 
 function Player:onSetLootList(lootList, mode)
-	if EventCallback.onSetLootList then
-		EventCallback.onSetLootList(self, lootList, mode)
+	local onSetLootList = EventCallback.onSetLootList
+	if onSetLootList then
+		onSetLootList(self, lootList, mode)
 	end
 end
 
 function Player:onManageLootContainer(item, mode, lootType)
-	if EventCallback.onManageLootContainer then
-		EventCallback.onManageLootContainer(self, item, mode, lootType)
+	local onManageLootContainer  = EventCallback.onManageLootContainer 
+	if onManageLootContainer then
+		onManageLootContainer(self, item, mode, lootType)
 	end
 end
 
 function Player:onFuseItems(fromItemType, fromTier, toItemType, successCore, tierLossCore)
-	if EventCallback.onFuseItems then
-		EventCallback.onFuseItems(self, fromItemType, fromTier, toItemType, successCore, tierLossCore)
+	local onFuseItems = EventCallback.onFuseItems
+	if onFuseItems then
+		onFuseItems(self, fromItemType, fromTier, toItemType, successCore, tierLossCore)
 	end
 end
 
 function Player:onTransferTier(fromItemType, fromTier, toItemType)
-	if EventCallback.onTransferTier then
-		EventCallback.onTransferTier(self, fromItemType, fromTier, toItemType)
+	local onTransferTier = EventCallback.onTransferTier
+	if onTransferTier then
+		onTransferTier(self, fromItemType, fromTier, toItemType)
 	end
 end
 
 function Player:onForgeConversion(conversionType)
-	if EventCallback.onForgeConversion then
-		EventCallback.onForgeConversion(self, conversionType)
+	local onForgeConversion = EventCallback.onForgeConversion
+	if onForgeConversion then
+		onForgeConversion(self, conversionType)
 	end
 end
 
 function Player:onForgeHistoryBrowse(page)
-	if EventCallback.onForgeHistoryBrowse then
-		EventCallback.onForgeHistoryBrowse(self, page)
+	local onForgeHistoryBrowse = EventCallback.onForgeHistoryBrowse
+	if onForgeHistoryBrowse then
+		onForgeHistoryBrowse(self, page)
 	end
 end
 
 function Player:onRequestPlayerTab(target, infoType, currentPage, entriesPerPage)
-	if EventCallback.onRequestPlayerTab then
-		EventCallback.onRequestPlayerTab(self, target, infoType, currentPage, entriesPerPage)
+	local onRequestPlayerTab = EventCallback.onRequestPlayerTab
+	if onRequestPlayerTab then
+		onRequestPlayerTab(self, target, infoType, currentPage, entriesPerPage)
 	end
 end
 
 function Player:onBestiaryInit()
-	if EventCallback.onBestiaryInit then
-		EventCallback.onBestiaryInit(self)
+	local onBestiaryInit = EventCallback.onBestiaryInit
+	if onBestiaryInit then
+		onBestiaryInit(self)
 	end
 end
 
 function Player:onBestiaryBrowse(category, raceList)
-	if EventCallback.onBestiaryBrowse then
-		EventCallback.onBestiaryBrowse(self, category, raceList)
+	local onBestiaryBrowse = EventCallback.onBestiaryBrowse
+	if onBestiaryBrowse then
+		onBestiaryBrowse(self, category, raceList)
 	end
 end
 
 function Player:onBestiaryRaceView(raceId)
-	if EventCallback.onBestiaryRaceView then
-		EventCallback.onBestiaryRaceView(self, raceId)
+	local onBestiaryRaceView = EventCallback.onBestiaryRaceView
+	if onBestiaryRaceView then
+		onBestiaryRaceView(self, raceId)
 	end
 end
 
@@ -453,9 +487,10 @@ function Player:onConnect(isLogin)
 	local cid = self:getId()
 	addEvent(sendForgeTypesAsync, 100, cid) -- classification info for market and forge
 	addEvent(sendColorTypesAsync, 200, cid) -- message colors meta
-	
-	if EventCallback.onConnect then
-		EventCallback.onConnect(self, isLogin)
+
+	local onConnect = EventCallback.onConnect
+	if onConnect then
+		onConnect(self, isLogin)
 	end
 end
 -- end onConnect

@@ -20,7 +20,7 @@
 	<!-- Player methods -->
 	<!-- Player - uncategorized -->
 	<event class="Player" method="onBrowseField" enabled="0" />
-	<event class="Player" method="onTurn" enabled="0" />
+	<event class="Player" method="onTurn" enabled="1" />
 	<event class="Player" method="onWrapItem" enabled="1" />
 	<event class="Player" method="onMinimapQuery" enabled="1" />
 	<event class="Player" method="onGuildMotdEdit" enabled="0" />

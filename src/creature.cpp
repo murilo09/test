@@ -172,7 +172,7 @@ void Creature::onThink(uint32_t interval)
 
 	if (isUpdatingPath) {
 		isUpdatingPath = false;
-		goToFollowCreature();
+		g_game.addToCheckFollow(this);
 	}
 
 	//scripting event - onThink
@@ -649,7 +649,7 @@ void Creature::onCreatureMove(Creature* creature, const Tile* newTile, const Pos
 
 	if (creature == followCreature || (creature == this && followCreature)) {
 		if (hasFollowPath) {
-			isUpdatingPath = true;
+			g_game.addToCheckFollow(this);
 		}
 
 		if (newPos.z != oldPos.z || !canSee(followCreature->getPosition())) {
@@ -1010,7 +1010,6 @@ void Creature::goToFollowCreature()
 					listWalkDir.clear();
 					if (getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
 						hasFollowPath = true;
-						startAutoWalk();
 					} else {
 						hasFollowPath = false;
 					}
@@ -1023,17 +1022,22 @@ void Creature::goToFollowCreature()
 				listWalkDir.push_back(dir);
 
 				hasFollowPath = true;
-				startAutoWalk();
 			}
 		} else {
 			listWalkDir.clear();
 			if (getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
 				hasFollowPath = true;
-				startAutoWalk();
 			} else {
 				hasFollowPath = false;
 			}
 		}
+	}
+}
+
+void Creature::goToFollowCreatureContinue()
+{
+	if (hasFollowPath) {
+		startAutoWalk(listWalkDir);
 	}
 
 	onFollowCreatureComplete(followCreature);

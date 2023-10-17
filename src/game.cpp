@@ -26,6 +26,7 @@
 #include "outfit.h"
 #include "party.h"
 #include "podium.h"
+#include "pathfinding.h"
 #include "scheduler.h"
 #include "script.h"
 #include "server.h"
@@ -80,6 +81,8 @@ void Game::start(ServiceManager* manager)
 	}
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
+
+	g_scheduler.addEvent(createSchedulerTask(EVENT_PATH_FINDING, std::bind(&Game::checkFollow, this, false)));
 }
 
 GameState_t Game::getGameState() const
@@ -139,6 +142,7 @@ void Game::setGameState(GameState_t newState)
 			g_dispatcher.addTask(
 				createTask([this]() { shutdown(); }));
 
+			g_pathfinding.stop();
 			g_scheduler.stop();
 			g_databaseTasks.stop();
 			g_dispatcher.stop();
@@ -3565,7 +3569,8 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	player->setAttackedCreature(attackCreature);
-	g_dispatcher.addTask(createTask([this, id = player->getID()]() { updateCreatureWalk(id); }));
+	addToCheckFollow(player);
+	// g_dispatcher.addTask(createTask([this, id = player->getID()]() { updateCreatureWalk(id); }));
 }
 
 void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
@@ -3576,8 +3581,9 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	player->setAttackedCreature(nullptr);
-	g_dispatcher.addTask(createTask([this, id = player->getID()]() { updateCreatureWalk(id); }));
+	// g_dispatcher.addTask(createTask([this, id = player->getID()]() { updateCreatureWalk(id); }));
 	player->setFollowCreature(getCreatureByID(creatureId));
+	addToCheckFollow(player);
 }
 
 void Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, bool chaseMode, bool secureMode)
@@ -4157,6 +4163,58 @@ bool Game::internalCreatureSay(Creature* creature, MessageClasses type, const st
 	return true;
 }
 
+void Game::checkFollow(bool thread) {
+	static std::mutex checkFollowMutex;
+	static std::set<Creature *>::iterator it;
+	static std::set<Creature *> checkFollowSetNew;
+
+	if (!thread) {
+		g_scheduler.addEvent(createSchedulerTask(EVENT_PATH_FINDING, std::bind(&Game::checkFollow, this, false)));
+		checkFollowSetNew = std::move(checkFollowSet);
+		checkFollowSet.clear();
+
+		auto it2 = checkFollowSetNew.begin();
+		int skipped = 0;
+		while (it2 != checkFollowSetNew.end()) {
+			// queue walking creatures path finding for next checkFollow
+			if (!(*it2)->isRemoved() && (*it2)->getWalkDelay() > EVENT_PATH_FINDING) {
+				checkFollowSet.insert((*it2));
+				it2 = checkFollowSetNew.erase(it2);
+				skipped++;
+			} else {
+				++it2;
+			}
+		}
+
+		it = checkFollowSetNew.begin();
+		g_pathfinding.runTask(std::bind(&Game::checkFollow, this, true));
+
+		for (auto &creature : checkFollowSetNew) {
+			creature->goToFollowCreatureContinue();
+			ReleaseCreature(creature);
+		}
+	} else {
+		while (true) {
+			checkFollowMutex.lock();
+			if (it == checkFollowSetNew.end()) {
+				checkFollowMutex.unlock();
+				break;
+			}
+			Creature *creature = *it;
+			++it;
+			checkFollowMutex.unlock();
+			creature->goToFollowCreature();
+		}
+	}
+}
+
+void Game::addToCheckFollow(Creature *creature)
+{
+	if (checkFollowSet.insert(creature).second) {
+		creature->incrementReferenceCounter();
+	}
+}
+
 void Game::checkCreatureWalk(uint32_t creatureId)
 {
 	Creature* creature = getCreatureByID(creatureId);
@@ -4170,7 +4228,7 @@ void Game::updateCreatureWalk(uint32_t creatureId)
 {
 	Creature* creature = getCreatureByID(creatureId);
 	if (creature && creature->getHealth() > 0) {
-		creature->goToFollowCreature();
+		creature->goToFollowCreatureContinue();
 	}
 }
 
@@ -5190,6 +5248,7 @@ void Game::shutdown()
 {
 	console::print(CONSOLEMESSAGE_TYPE_INFO, "Shutting down ... ");
 
+	g_pathfinding.shutdown();
 	g_scheduler.shutdown();
 	g_databaseTasks.shutdown();
 	g_dispatcher.shutdown();

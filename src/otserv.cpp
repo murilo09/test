@@ -18,6 +18,7 @@
 #include "script.h"
 #include "scriptmanager.h"
 #include "server.h"
+#include "pathfinding.h"
 
 #include <fstream>
 #include <iomanip>
@@ -29,6 +30,7 @@
 DatabaseTasks g_databaseTasks;
 Dispatcher g_dispatcher;
 Scheduler g_scheduler;
+PathFinding g_pathfinding(PATHFINDING_THREADS);
 
 Game g_game;
 ConfigManager g_config;
@@ -79,6 +81,7 @@ int main(int argc, char* argv[])
 
 	g_dispatcher.start();
 	g_scheduler.start();
+	g_pathfinding.start();
 
 	g_dispatcher.addTask(createTask([=, services = &serviceManager]() { mainLoader(argc, argv, services); }));
 
@@ -90,11 +93,13 @@ int main(int argc, char* argv[])
 		serviceManager.run();
 	} else {
 		console::print(CONSOLEMESSAGE_TYPE_ERROR, "No services running. The server is NOT online!");
+		g_pathfinding.shutdown();
 		g_scheduler.shutdown();
 		g_databaseTasks.shutdown();
 		g_dispatcher.shutdown();
 	}
 
+	g_pathfinding.join();
 	g_scheduler.join();
 	g_databaseTasks.join();
 	g_dispatcher.join();

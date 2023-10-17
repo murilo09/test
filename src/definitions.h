@@ -4,6 +4,8 @@
 #ifndef FS_DEFINITIONS_H
 #define FS_DEFINITIONS_H
 
+#define PATHFINDING_THREADS 4
+
 static constexpr auto STATUS_SERVER_NAME = "The Forgotten Server";
 static constexpr auto STATUS_SERVER_VERSION = "1.5 OTA";
 static constexpr auto STATUS_SERVER_DEVELOPERS = "OTAcademy";
